@@ -2,6 +2,9 @@
 #define TABLERO_H
 
 #include "pieza.h"
+#include <SDL_thread.h>
+
+//Initialize semaphore
 
 class Tablero{
 	public:
@@ -18,12 +21,10 @@ class Tablero{
         bool Comprueba_bajada(Pieza &pieza);
         bool Comprueba_derecha(Pieza &pieza);
         bool Comprueba_izquierda(Pieza &pieza);
+        bool Comprueba_giro(Pieza &pieza);
         //Variables
-
-
-
-	private:
-		std::vector<std::vector<bool>> _tablero;//variable contiene si posición esta ocupada
+		std::vector<std::vector<bool>> _tablero; //Posiciones ocupadas del tablero
+        SDL_sem* gDataLock = NULL;
 };
 
 #endif
