@@ -64,6 +64,9 @@ void Pieza::_inicializacion_pieza(){
     srand (time(NULL)); //semilla para generación aleatoria
     coordenada.x_columna = (rand() % (COLUMNAS-1-posiciones[0].size()))+1; // posiciona aleatoriamente la pieza en la primera fila
     pieza_a_coordenadas();
+
+    cod_color = rand() % 13;
+
     std::cout<<"Pieza " << this << " inicializada"<<std::endl;
     std::cout <<std::endl;
 }

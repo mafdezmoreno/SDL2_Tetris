@@ -56,22 +56,22 @@ void Actualiza_Pantalla(Pieza &pieza, Tablero &tablero_estatico){
 
 	Coordenada coord_mapeada = Mapeado_Coord_Tablero(pieza.coordenada);
 	//Renderiza la pieza recorriendo todas sus casillas
-    for(int8_t i = 0; i < pieza.posiciones.size() ; i++){	
-    	for(int8_t j = 0; j<  pieza.posiciones[0].size(); j++){
+    for(int i = 0; i < pieza.posiciones.size() ; i++){	
+    	for(int j = 0; j<  pieza.posiciones[0].size(); j++){
 			if (pieza.posiciones[i][j]==true){
 				SDL_Rect fillRect = { coord_mapeada.x_columna+j*REJILLA, coord_mapeada.y_fila+i*REJILLA, REJILLA, REJILLA};
-				SDL_SetRenderDrawColor( Render, pieza.colores[0], pieza.colores[1], pieza.colores[2], 0xFF );		
+				SDL_SetRenderDrawColor( Render, colores[pieza.cod_color][0], colores[pieza.cod_color][1], colores[pieza.cod_color][2], 0xFF );
 				SDL_RenderFillRect( Render, &fillRect );
 			}
 		}
 	}
 
 	//Renderizado de las posiciones ocupadas del tablero
-	for(int8_t i = 1; i < (tablero_estatico._tablero.size()-1) ; i++){	
-    	for(int8_t j = 1; j<  (tablero_estatico._tablero[0].size()-1); j++){
+	for(int i = 1; i < (tablero_estatico._tablero.size()-1) ; i++){	
+    	for(int j = 1; j<  (tablero_estatico._tablero[0].size()-1); j++){
 			if (tablero_estatico._tablero[i][j]==true){
 				SDL_Rect fillRect = {j*REJILLA, i*REJILLA, REJILLA, REJILLA};
-				SDL_SetRenderDrawColor( Render, pieza.colores[0], pieza.colores[1], pieza.colores[2], 0xFF );		
+				SDL_SetRenderDrawColor( Render, colores[0][0], colores[0][1], colores[0][2], 0xFF );		
 				SDL_RenderFillRect( Render, &fillRect );
 			}
 		}
@@ -91,9 +91,11 @@ void Actualiza_Tablero_Dinamico(Pieza &pieza, Tablero &tablero){
 		tablero.intro_coord_tabla(pieza); //Introduce la pieza en la tabla
 	}
 }
+
 void Actualiza_Tablero_Estatico(Pieza &pieza, Tablero &tablero){
 		pieza.pieza_a_coordenadas(); //Actualiza el set de coordenadas
 		tablero.intro_coord_tabla(pieza); //Introduce la pieza en la tabla
+		tablero.eliminar_filas_llenas(); //
 }
 
 bool inicializar()

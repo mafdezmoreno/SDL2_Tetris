@@ -10,10 +10,15 @@
 #include <stdlib.h>  //cls
 #include <SDL.h>
 #include <SDL_thread.h>
-//#include <thread>    // std::thread    
-//#include <mutex>
 
-
+//! TO DO:
+//! Imprimir puntuación en la ventana al lado del tablero.
+//! Imprimir el nivel del juego al lado del tablero
+//!	Generar la pieza siguiente, y renderizarla al lado del tablero
+//! Implementar incremento automático de la velocidad
+//! Color en las piezas del tablero estático
+//! Crear una clase para guardar el color de las casillas del tablero
+//! Implementar refresco de la pantalla y eliminar los sleep introducidos
 
 // VARIABLES GLOBALES
 int Nivel = 0;	//1	//2	 //3  //4  //5  //6  //7  //8  //9 //10
@@ -53,6 +58,7 @@ int main( int argc, char* args[] )
 			delay = SDL_AddTimer(delay, my_callbackfunc, pieza);
 			pieza_bloqueada = false;
 			while(true){
+
 				Sleep(200);//ms //! TO DO: Implementar tasa de refresco de 60HZ
 				//std::cout<< cerrar << " " << pieza<< std::endl;				
 				while( SDL_PollEvent( &eventos ) != 0 ){ //Cola de eventos	
@@ -78,6 +84,7 @@ int main( int argc, char* args[] )
 					bajar_pieza = false;
 					bajar_pieza_si_puede(pieza);
 				}
+				Actualiza_Pantalla(*pieza, tablero_estatico); //renderizado de tablero con piezas fijas y actual pieza moviéndose
 			}
 			if(cerrar_programa)
 				break;
@@ -85,7 +92,7 @@ int main( int argc, char* args[] )
 				break;
 		}
 		Sleep(3000);//ms
-		//! imprimir resultados (puntuación) en la ventana
+		//! TO DO imprimir resultados (puntuación) en la ventana
 	} 
 	cerrar(); //Liberar recursos reservados
 	
@@ -98,30 +105,26 @@ void bajar_pieza_si_puede(Pieza* p_pieza){
 	
 	if(p_pieza!=nullptr){
 		if(tablero_estatico.Comprueba_bajada(*p_pieza)){ //Si puede bajar
-			//p_pieza->coordenada_previa = p_pieza->coordenada;//actualizo la coordenada previa antes de que cambie
+
 			p_pieza->coordenada.y_fila = p_pieza->coordenada.y_fila + 1;
-			std::cout<< "p_pieza moved "<< p_pieza<<std::endl;
+			std::cout<< "PIEZA BAJADA AUTOMÁTICAMENTE "<<std::endl;
+			Actualiza_Tablero_Dinamico(*p_pieza, tablero_dinamico);
+			tablero_dinamico.imprime_tabla();//para debug en consola
 		}
 		else{
 			//! Cuando no se puede bajar, aquí se pasa la pieza al tablero estático
-			Actualiza_Tablero_Estatico(*p_pieza, tablero_estatico);
-			//tablero_estatico.intro_coord_tabla(*p_pieza); // como no puede bajar más, se introduce al tablero estatico		
-			std::cout<< "p_pieza deleted "<< p_pieza<<std::endl;
+			Actualiza_Tablero_Estatico(*p_pieza, tablero_estatico);//borra filas ocupadas
+
+			std::cout<< "TABLERO ESTATICO COPIADO AL DINAMICO. ELIMINADO DE HUECOS "<<std::endl;
+			tablero_dinamico = tablero_estatico;
 			tablero_estatico.imprime_tabla();//para debug en consola
-			//delete p_pieza;
-			//p_pieza = nullptr;
 			pieza_bloqueada = true;
 			
 			if(p_pieza->coordenada.y_fila<=1){
 				std::cout<<"FIN DEL JUEGO"<<std::endl;
 				tablero_lleno=true;
 			}
-
 		}
-
-		Actualiza_Pantalla(*p_pieza, tablero_estatico);
-		Actualiza_Tablero_Dinamico(*p_pieza, tablero_dinamico);
-		tablero_dinamico.imprime_tabla();//para debug en consola
 	}
 }
 

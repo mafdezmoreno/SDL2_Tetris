@@ -14,4 +14,5 @@ void Actualiza_Tablero_Dinamico(Pieza &pieza, Tablero &MSHLFLAGS_TABLESTRONG);
 void Actualiza_Tablero_Estatico(Pieza &pieza, Tablero &tablero);
 Coordenada Mapeado_Coord_Tablero(Coordenada &coord);
 
+
 #endif

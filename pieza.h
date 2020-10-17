@@ -43,13 +43,6 @@ class Pieza{
         Pieza(){  
             _inicializacion_pieza();
         }
-        /*Pieza(int y, int x){
-            coordenada.y_fila = y;
-            coordenada.x_columna = x;
-            coordenada_previa.y_fila = y;
-            coordenada_previa.x_columna = x;
-            _inicializacion_pieza();
-        }*/
         ~Pieza(){
             std::cout<< "PIEZA "<< this << " DESTRUIDA" << std::endl;
         }
@@ -60,7 +53,7 @@ class Pieza{
         std::vector<std::vector<bool>> Gira_Pieza_90(std::vector<std::vector<bool>> pieza);
         
         //VARIABLES
-        std::vector<uint8_t> colores {0,0,255}; //azul
+        int cod_color; 
         std::vector<std::vector<bool>> posiciones;// = {{1, 1, 1},  // pieza tetris L de ejemplo para renderizar
                                                   //  { 1, 0, 0}}; // dos FILA, 3 COLUMNA
         
