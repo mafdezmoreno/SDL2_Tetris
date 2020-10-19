@@ -1,8 +1,6 @@
 #include "tablero.h"
 #include "main.h"
 #include <SDL_thread.h>
-//
-
 
 Tablero::Tablero(){ //Inicializa la tabla
 	
@@ -23,12 +21,11 @@ Tablero::Tablero(){ //Inicializa la tabla
 
 Tablero::~Tablero(){ //Destruye la tabla
 
-			//std::cout<< "Tabla "<< this << " destruida" << std::endl;
-			//imprime_tabla();
+	//std::cout<< "Tabla "<< this << " destruida" << std::endl;
+	//imprime_tabla();
     //Free semaphore
-    SDL_DestroySemaphore( gDataLock );
-    
-    gDataLock = NULL;
+    //SDL_DestroySemaphore( gDataLock );
+    //gDataLock = NULL;
 }
 
 
@@ -78,7 +75,7 @@ bool Tablero::Comprueba_izquierda(Pieza &pieza){
 bool Tablero::Comprueba_giro(Pieza &pieza){
     
     Pieza buffer = pieza; //crea una nueva pieza
-    buffer.posiciones = buffer.Gira_Pieza_90(buffer.posiciones);
+    buffer.Gira_Pieza_90();
     buffer.pieza_a_coordenadas(); //actualizo el set de coordenadas de la pieza
     if(comprueba_cabe_pieza(buffer) == true){//compruebo si cabe la pieza
        
@@ -211,7 +208,7 @@ void Tablero::copiado_filas(int fila){
 
 void Tablero::compactar_filas_tabla(int fila){
 
-    bool fila_vacia = false;
+    //bool fila_vacia = false;
     std::cout<<"Compactado de fila "<< fila <<std::endl;
     int i;
     for(i=fila; i > 1; i--){
@@ -219,11 +216,12 @@ void Tablero::compactar_filas_tabla(int fila){
         copiado_filas(i);
         if(comprobar_fila_vacia(i)){
             //std::cout<<"Fila vacia"<< std::endl;
-            fila_vacia = true;
+            //fila_vacia = true;
             break;
         }
     }
-    if ((!comprobar_fila_vacia(i))||(i==1)){
+    //if ((!comprobar_fila_vacia(i))||(i==1)){
+    if(i==1){ //elimina la fila superior si tiene algún contenido tras el compactado
         int j = i;
         for(int i = 1; i<(_tablero[0].size()-1); i++)
             _tablero[j][i]=0;
@@ -239,9 +237,14 @@ void Tablero::eliminar_filas_llenas(){
     if(filas_llenas.size()>0){
         std::cout<<"Eliminado de filas llenas: " <<std::endl;
         int contador_filas_eliminadas = 0;
-        for(int i = (filas_llenas.size()-1); i>=0; i--){
+        for(int i = 0 ; i<filas_llenas.size(); i++){
             compactar_filas_tabla(filas_llenas[i]+contador_filas_eliminadas);
             contador_filas_eliminadas++;
+        }
+        puntuacion = puntuacion + contador_filas_eliminadas;
+        if(((int)(puntuacion/10))>(nivel)){
+            nivel++;
+            std::cout<<"Has subido al nivel: "<< nivel <<std::endl;
         }
     }
     else

@@ -6,6 +6,11 @@
 
 # Important: Move window.png into build folder or compile evrerythin in the work folder
 
+set(CC "C:\\msys64\\mingw32\\bin\\gcc.exe")
+set(CXX "C:\\msys64\\mingw32\\bin\\g++.exe")
+
+set (CMAKE_CXX_STANDARD 20)
+
 cmake_minimum_required(VERSION 3.7)
 
 project(apilado)
@@ -14,7 +19,7 @@ find_package(SDL2 REQUIRED)
 find_package (Threads REQUIRED) #Para que encuentre las librerías necesarias de multi-hilo
 include_directories(${SDL2_INCLUDE_DIRS})
 
-add_executable(${CMAKE_PROJECT_NAME} main.cpp apilado.cpp tablero.cpp pieza.cpp)
+add_executable(${CMAKE_PROJECT_NAME} main.cpp apilado.cpp tablero.cpp pieza.cpp texto.cpp)
 
 
 ## INCLUSIÓN DE LAS LIBRERIAS SLD2 NECESARIAS

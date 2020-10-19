@@ -24,7 +24,7 @@ const std::vector<std::vector<std::vector<bool>>> tipos_piezas =
 class Coordenada{
     public:
         Coordenada(){
-            y_fila = 0;
+            y_fila = 1;
             x_columna = 1;
         }
         Coordenada(int fila, int columna){
@@ -36,8 +36,8 @@ class Coordenada{
         int x_columna;
 };
 
-//! TO DO: implementar posicionado de piezas aleatoria en la primera fila
 class Pieza{
+
     public:
         //FUNCIONES
         Pieza(){  
@@ -50,16 +50,13 @@ class Pieza{
         void pieza_a_coordenadas();        //genera Coordenadas, de cada uno de los cubos de la pieza
         void imprime_set_coordenadas();    //imprime variable set_coordenadas
         void generador_aleatorio_pieza();  //selecciona una pieza aleatoria de tipos_piezas
-        std::vector<std::vector<bool>> Gira_Pieza_90(std::vector<std::vector<bool>> pieza);
+        void Gira_Pieza_90();
         
         //VARIABLES
         int cod_color; 
-        std::vector<std::vector<bool>> posiciones;// = {{1, 1, 1},  // pieza tetris L de ejemplo para renderizar
-                                                  //  { 1, 0, 0}}; // dos FILA, 3 COLUMNA
-        
-        
+        std::vector<std::vector<bool>> posiciones;
         std::vector<Coordenada> set_coordenadas; //contendrá la lista de coordenadas a renderizar en el tablero
-        std::vector<Coordenada> set_coordenadas_previo;
+        //std::vector<Coordenada> set_coordenadas_previo;
         Coordenada coordenada; //para posicionar/mover la pieza
         Coordenada coordenada_previa; //para borrar posición anterior de la pieza 
         void _inicializacion_pieza();

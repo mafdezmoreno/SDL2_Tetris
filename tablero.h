@@ -36,7 +36,7 @@ class Tablero{
             void copiado_filas(int fila);
         
         //Variables
-        //! TO DO: INCLUIR CODIGO COLOR A CADA POSICIÓN
+        //! TO DO: INCLUIR CÓDIGO COLOR A CADA POSICIÓN
 		std::vector<std::vector<bool>> _tablero; //Posiciones ocupadas del tablero
         
         SDL_sem* gDataLock = NULL;
