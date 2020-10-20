@@ -112,3 +112,8 @@ void Pieza::generador_aleatorio_pieza(){
     //srand (time(NULL)); //semilla para generación aleatoria
     posiciones = tipos_piezas[distr(gen)]; //copia una pieza aleatoria de las posibles
 }
+
+//obtener colores de la pieza
+int Pieza::get_r(){return colores[cod_color][0];}
+int Pieza::get_g(){return colores[cod_color][1];}
+int Pieza::get_b(){return colores[cod_color][2];}

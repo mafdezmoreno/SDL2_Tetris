@@ -2,11 +2,8 @@
 #define MAIN_H
 
 #include <SDL.h>
-//#include <SDL_image.h>
-#include <SDL_ttf.h> //! Necesaria
-#include "pieza.h"
-#include "tablero.h"
-//#include <map>
+//#include "pieza.h"
+//#include "tablero.h"
 #include "texto.h"
 
 
@@ -21,6 +18,9 @@ extern Texto Texto_Nivel;
 extern Texto Valor_Nivel;
 extern Texto Nombre_Jugador;
 extern Texto Texto_Jugador;
+extern Texto pedir_nombre_jugador;
+extern Texto Nombre_Jugador_Temp;
+extern Texto pulsa_intro_continuar;
 
 //Contabilización de puntuación
 extern int puntuacion;
@@ -30,22 +30,20 @@ extern int nivel;
 // CONSTANTES
 const int REJILLA = 20; //píxeles
 
+//dimensiones del tablero 
 const int COLUMNAS = 8;
 const int FILAS = 12;
-
 const int ANCHO_TABLERO = COLUMNAS;
 const int ALTO_TABLERO = FILAS;
 
+//Dimensiones de la ventana. Se adaptan a las del tablero
 const int ANCHO = (COLUMNAS + 12) * REJILLA;
 const int ALTO = (FILAS + 2) * REJILLA;
 
+//Tamaño de todo el texto que se va a renderizar
 const int TEXT_SIZE = 16;
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
-
-
+//Códigos de colores para piezas y renderizados
 const int colores[16][3]     = {{0,0,0},            //0 black 
                                 {255,255,255},      //1 white
                                 {0xC0,0xC0,0xC0},   //2 silver

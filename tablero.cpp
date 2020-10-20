@@ -1,10 +1,10 @@
 #include "tablero.h"
 #include "main.h"
-#include <SDL_thread.h>
+//#include <SDL_thread.h>
 
 Tablero::Tablero(){ //Inicializa la tabla
 	
-    gDataLock = SDL_CreateSemaphore( 1 );
+    //gDataLock = SDL_CreateSemaphore( 1 );
 
     _tablero.resize(FILAS+2);
 	for (int fila = 0 ; fila < (FILAS+2) ; fila++){
@@ -31,17 +31,17 @@ Tablero::~Tablero(){ //Destruye la tabla
 
 bool Tablero::Comprueba_bajada(Pieza &pieza){
     
-    SDL_SemWait( gDataLock );
+    //SDL_SemWait( gDataLock );
     Pieza buffer = pieza; //el compilador se encarga de hacer la copia (más adelante implementar move semantics)
     buffer.coordenada.y_fila = buffer.coordenada.y_fila + 1; //bajo la pieza copiada
     buffer.pieza_a_coordenadas(); //actualizo el set de coordenadas de la pieza
     if(comprueba_cabe_pieza(buffer) == true){//compruebo si cabe la pieza
         //std::cout<<"La pieza " << &pieza << " puede bajar "<<std::endl;
-        SDL_SemPost( gDataLock );
+        //SDL_SemPost( gDataLock );
         return true;
     }
     std::cout<<"La pieza " << &pieza <<" no puede bajar "<<std::endl;
-    SDL_SemPost( gDataLock );
+    //SDL_SemPost( gDataLock );
     return false;
 
 }
@@ -99,8 +99,8 @@ bool Tablero::comprueba_cabe_pieza(Pieza &pieza){ //devuelve true si cabe y fals
 
 void Tablero::imprime_tabla(){
     		
-    SDL_SemWait( gDataLock ); //para evitar impresiones que corten la tabla
-    std::cout<<"Tablero "<<this<< " gDataLock "<< gDataLock <<std::endl;
+    //SDL_SemWait( gDataLock ); //para evitar impresiones que corten la tabla
+    //std::cout<<"Tablero "<<this<< " gDataLock "<< gDataLock <<std::endl;
     //system("cls");
     std::cout<<"   ";
     for ( int i = 0 ; i < COLUMNAS+2 ; i++){
@@ -128,7 +128,7 @@ void Tablero::imprime_tabla(){
         }
     	std::cout<<std::endl;
     }
-    SDL_SemPost( gDataLock );
+    //SDL_SemPost( gDataLock );
 }
 
 

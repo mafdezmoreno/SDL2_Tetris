@@ -16,7 +16,7 @@ SDL_Renderer* Render = NULL; // Elementos a renderizar en interior
 int nivel_previo = -1;
 
 void Dibuja_tablero(){
-												//coord x //coord y	 //ancho 25		           //alto 35
+
 	SDL_Rect cuadrado = { REJILLA, REJILLA, ANCHO_TABLERO* REJILLA , ALTO_TABLERO* REJILLA};
 	SDL_SetRenderDrawColor( Render, 0x00, 0x00, 0x00, 0x00 );   //Borde tablero en negro    
 	SDL_RenderDrawRect( Render, &cuadrado );
@@ -68,7 +68,7 @@ void Actualiza_Pantalla(Pieza &pieza, Tablero &tablero_estatico, Pieza &siguient
     	for(int j = 0; j<  pieza.posiciones[0].size(); j++){
 			if (pieza.posiciones[i][j]==true){
 				SDL_Rect fillRect = { coord_mapeada.x_columna+j*REJILLA, coord_mapeada.y_fila+i*REJILLA, REJILLA, REJILLA};
-				SDL_SetRenderDrawColor( Render, colores[pieza.cod_color][0], colores[pieza.cod_color][1], colores[pieza.cod_color][2], 0xFF );
+				SDL_SetRenderDrawColor( Render, pieza.get_r(), pieza.get_g(), pieza.get_b(), 0xFF );
 				SDL_RenderFillRect( Render, &fillRect );
 			}
 		}
@@ -79,7 +79,7 @@ void Actualiza_Pantalla(Pieza &pieza, Tablero &tablero_estatico, Pieza &siguient
     	for(int j = 0; j<  siguiente_pieza.posiciones[0].size(); j++){
 			if (siguiente_pieza.posiciones[i][j]==true){
 				SDL_Rect fillRect = { ANCHO - 6*REJILLA+j*REJILLA, 8*REJILLA+i*REJILLA, REJILLA, REJILLA};
-				SDL_SetRenderDrawColor( Render, colores[siguiente_pieza.cod_color][0], colores[siguiente_pieza.cod_color][1], colores[siguiente_pieza.cod_color][2], 0xFF );
+				SDL_SetRenderDrawColor( Render,  siguiente_pieza.get_r(), siguiente_pieza.get_g(), siguiente_pieza.get_b(), 0xFF );
 				SDL_RenderFillRect( Render, &fillRect );
 			}
 		}
@@ -125,12 +125,12 @@ void Actualiza_Pantalla(Pieza &pieza, Tablero &tablero_estatico, Pieza &siguient
 
 void Actualiza_Tablero_Dinamico(Pieza &pieza, Tablero &tablero){
 	
-	if((pieza.coordenada.y_fila!=pieza.coordenada_previa.y_fila)||
-		(pieza.coordenada.x_columna!=pieza.coordenada_previa.x_columna)){ //si la pieza se mueve se actualiza posición
+	//if((pieza.coordenada.y_fila!=pieza.coordenada_previa.y_fila)||
+	//	(pieza.coordenada.x_columna!=pieza.coordenada_previa.x_columna)){ //si la pieza se mueve se actualiza posición
 		tablero.borra_coord_tabla(pieza); //borra la posición obsoleta de la tabla
 		pieza.pieza_a_coordenadas(); //Actualiza el set de coordenadas
 		tablero.intro_coord_tabla(pieza); //Introduce la pieza en la tabla
-	}
+	//}
 }
 
 void Actualiza_Tablero_Estatico(Pieza &pieza, Tablero &tablero){
@@ -201,6 +201,8 @@ void cerrar()
 	SDL_Quit();
 	TTF_Quit();
 
+	std::cout<<"PROGRAMA FINALIZADO CORRECTAMENTE"<<std::endl;
+
 }
 
 bool cargar_texto()
@@ -215,7 +217,6 @@ bool cargar_texto()
 	else{
 		if(!Texto_Puntuacion.cargar_texto_renderizado( "Puntuacion: ")||
 			!Texto_Nivel.cargar_texto_renderizado( "Nivel: ")||
-			!Nombre_Jugador.cargar_texto_renderizado( "Miguel ")||
 			!Texto_Jugador.cargar_texto_renderizado( "Jugador: "))
 		{
 			std::cout<< "No se ha podido renderizar la textura para el texto" <<std::endl;

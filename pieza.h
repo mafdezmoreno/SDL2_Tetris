@@ -53,13 +53,21 @@ class Pieza{
         void Gira_Pieza_90();
         
         //VARIABLES
-        int cod_color; 
+        
         std::vector<std::vector<bool>> posiciones;
         std::vector<Coordenada> set_coordenadas; //contendrá la lista de coordenadas a renderizar en el tablero
         //std::vector<Coordenada> set_coordenadas_previo;
         Coordenada coordenada; //para posicionar/mover la pieza
-        Coordenada coordenada_previa; //para borrar posición anterior de la pieza 
+        //Coordenada coordenada_previa; //para borrar posición anterior de la pieza 
+        
+        //obtener colores de la pieza
+        int get_r();
+        int get_g();
+        int get_b();
+    
+    private:
         void _inicializacion_pieza();
+        int cod_color;
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "main.h"
+#include <iostream>
 
 TTF_Font* Fuente_TTF = NULL;
 
@@ -17,6 +18,7 @@ Texto::~Texto()
 bool Texto::cargar_texto_renderizado( std::string texto_renderizar)
 {
 
+	_cadena_texto = texto_renderizar;
 	liberar();
 	SDL_Surface* Texto_Surface = TTF_RenderText_Blended( Fuente_TTF, texto_renderizar.c_str(),  {0,0,0});
 	
@@ -54,15 +56,16 @@ void Texto::liberar()
 	}
 }
 
-void Texto::renderizar( int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip )
+//void Texto::renderizar( int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip )
+void Texto::renderizar( int x, int y)
 {
 	SDL_Rect renderQuad = { x, y, _ancho, _alto };
-	if( clip != nullptr )
-	{
-		renderQuad.w = clip->w;
-		renderQuad.h = clip->h;
-	}
-	SDL_RenderCopyEx( Render, _Textura, clip, &renderQuad, angle, center, flip );
+	//if( clip != nullptr )
+	//{
+	//	renderQuad.w = clip->w;
+	//	renderQuad.h = clip->h;
+	//}
+	SDL_RenderCopyEx( Render, _Textura, nullptr, &renderQuad, 0, nullptr, SDL_FLIP_NONE );
 }
 
 int Texto::get_ancho()
@@ -73,4 +76,9 @@ int Texto::get_ancho()
 int Texto::get_alto()
 {
 	return _alto;
+}
+
+std::string Texto::get_cadena_texto(){
+
+	return _cadena_texto;
 }
