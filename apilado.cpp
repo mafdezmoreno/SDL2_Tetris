@@ -216,8 +216,8 @@ bool cargar_texto()
 	}
 	else{
 		if(!Texto_Puntuacion.cargar_texto_renderizado( "Puntuacion: ")||
-			!Texto_Nivel.cargar_texto_renderizado( "Nivel: ")||
-			!Texto_Jugador.cargar_texto_renderizado( "Jugador: "))
+		   !Texto_Nivel.cargar_texto_renderizado( "Nivel: ")||
+		   !Texto_Jugador.cargar_texto_renderizado( "Jugador: "))
 		{
 			std::cout<< "No se ha podido renderizar la textura para el texto" <<std::endl;
 			carga_texto = false;

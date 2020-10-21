@@ -2,9 +2,26 @@
 #include "main.h"
 //#include <SDL_thread.h>
 
-Tablero::Tablero(){ //Inicializa la tabla
+Tablero::Tablero(){ //! Constructor
 	
-    //gDataLock = SDL_CreateSemaphore( 1 );
+/* https://stackoverflow.com/questions/3904224/declaring-a-pointer-to-multidimensional-array-and-allocating-the-array/3904306#3904306
+int width = 5;
+int height = 5;
+int** arr = new int*[width];
+for(int i = 0; i < width; ++i)
+   arr[i] = new int[height];
+*/
+
+    _tabla = new bool*[FILAS+2];
+    for (int fila = 0 ; fila < (FILAS+2) ; fila++){
+        _tabla[fila] =  new bool[COLUMNAS+2];
+        for( int columna = 0 ; columna < (COLUMNAS+2) ; columna++){
+            if(fila == 0 || fila == FILAS +1 || columna == 0 || columna == COLUMNAS+1)
+				_tabla[fila][columna] = true;
+			else
+				_tabla[fila][columna] = false;
+        }
+    }
 
     _tablero.resize(FILAS+2);
 	for (int fila = 0 ; fila < (FILAS+2) ; fila++){
@@ -15,18 +32,91 @@ Tablero::Tablero(){ //Inicializa la tabla
 					else
 						_tablero[fila][columna] = false;
 				}
-				std::cout<< std::endl;
 	}
 }
 
-Tablero::~Tablero(){ //Destruye la tabla
+Tablero::~Tablero(){ //! Destructor
 
+    //https://stackoverflow.com/questions/30720594/deleting-a-dynamically-allocated-2d-array
+    for (int fila = 0 ; fila < (FILAS+2) ; fila++){
+        delete [] _tabla[fila];
+    }
+    delete[] _tabla;
 	//std::cout<< "Tabla "<< this << " destruida" << std::endl;
 	//imprime_tabla();
     //Free semaphore
     //SDL_DestroySemaphore( gDataLock );
     //gDataLock = NULL;
 }
+
+
+Tablero::Tablero(Tablero& original)  //! Copy constructor
+{
+
+    _tablero = original._tablero;
+
+    _tabla = new bool*[FILAS+2];
+    for (int fila = 0 ; fila < (FILAS+2) ; fila++){
+        _tabla[fila] =  new bool[COLUMNAS+2];
+        for( int columna = 0 ; columna < (COLUMNAS+2) ; columna++){
+            _tabla[fila][columna] = original._tabla[fila][columna];
+        }
+    }
+}
+/*
+        rule_five_string(rule_five_string& original) 
+            :longitud{original.longitud},
+            buffer{new char[original.longitud]}
+            {
+            std::strncpy(buffer, original.buffer, longitud);
+            std::cout<< "Copy Constructor: ";
+            imprime_this();
+        }
+*/
+
+
+
+
+Tablero::Tablero(Tablero&& original) noexcept //! Move constructor
+{
+    _tablero = original._tablero;
+    //https://stackoverflow.com/questions/13679635/how-to-properly-destroy-c-vector-of-vectors-and-release-memory
+    
+    std::vector<std::vector<bool>> empty_vector;
+    original._tablero.swap(empty_vector); //swap whit empty vector to clear
+    original._tablero.clear();
+}
+
+Tablero& Tablero::operator=(Tablero& original){ //! Copy Assignment operator
+
+    if (this == &original) return *this; //protección autocopia
+
+     std::vector<std::vector<bool>> empty_vector;
+    _tablero.swap(empty_vector); //swap whit empty vector to clear
+    
+    //realiza todas las copias de las variables de original
+    _tablero = original._tablero;
+  
+    return *this;
+}
+
+Tablero& Tablero::operator=(Tablero&& original) noexcept{ //! Move Assignmet operator
+
+ 
+    if (this == &original) return *this; //protección automovimiento
+
+    std::vector<std::vector<bool>> empty_vector;
+    _tablero.swap(empty_vector); //swap whit empty vector to clear
+    _tablero.clear();
+            
+    _tablero = original._tablero;
+
+    original._tablero.swap(empty_vector); //swap whit empty vector to clear
+    original._tablero.clear();
+
+    return *this;
+}
+
 
 
 bool Tablero::Comprueba_bajada(Pieza &pieza){

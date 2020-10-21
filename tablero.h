@@ -5,11 +5,11 @@
 
 //Initialize semaphore
 
+//! Cambiar _tablero a dinamic raw pointer
+
 class Tablero{
 	public:
 
-		Tablero();  //Inicializa la tabla
-        ~Tablero(); //Destruye la tabla
 
         //Funciones de modificacion
         void intro_coord_tabla(Pieza &pieza); //ocupa el espacio de la tabla con las coordenadas de la pieza
@@ -26,8 +26,26 @@ class Tablero{
 
         //Compactado tabla
         void eliminar_filas_llenas();
-
+    
+    //VARIABLES
         std::vector<std::vector<bool>> _tablero; //Posiciones ocupadas del tablero
+        bool** _tabla;
+
+        //RULE OF FIVE
+
+        //! Constructor
+        Tablero();
+        //! Destructor
+        ~Tablero();
+        //! Copy constructor
+        Tablero(Tablero& original);
+        //! Move constructor
+        Tablero(Tablero&& original) noexcept;
+        //! Copy Assignment operator
+        Tablero& operator=(Tablero& original);
+        //! Move Assignmet operator
+        Tablero& operator=(Tablero&& original) noexcept;
+
 
     private:
 

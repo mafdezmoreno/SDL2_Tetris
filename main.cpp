@@ -17,8 +17,11 @@
 #include <sstream>
 #include <ctime> 
 
+//! BUG:: ALGUNA PIEZA INICIA FUERA DEL TABLERO!!!!
+
 //! Mejoras:
-// Crear una nueva clase: juego. Almacenar en ella todas las funciones de los ficheros apilado
+//! Cambiar _tablero a dinamic raw pointer
+//! Crear una nueva clase: juego. Almacenar en ella todas las funciones de los ficheros apilado
 // Renderizar solo zonas concretas de la pantalla, sin limpiar el contenido anterior
 // Color en las piezas del tablero estático
 // Crear una clase para guardar el color de las casillas del tablero
@@ -33,10 +36,8 @@
 	//! incluir las funciones de main sin clase en una clase GAME (que se inicializará en main())
 	//! hacer algún overload de alguna función (quizás los mas fácil sea hacerlo de un constructor)
 	//! Derived class functions override virtual base class functions: One member function in an inherited class overrides a virtual base class member function.
-	//! One function is declared with a template that allows it to accept a generic parameter.
 
 //!Memory Management
-	//! The project makes use of references in function declarations: At least two variables are defined as references, or two functions use pass-by-reference in the project code.
 	//! The project uses destructors appropriately: At least one class that uses unmanaged dynamically allocated memory, along with any class that otherwise needs to modify state upon the termination of an object, uses a destructor.
 	//! The project uses scope / Resource Acquisition Is Initialization (RAII) where appropriate: The project follows the Resource Acquisition Is Initialization pattern where appropriate, by allocating objects at compile-time, initializing objects when they are declared, and utilizing scope to ensure their automatic destruction.
 	//! The project follows the Rule of 5: For all classes, if any one of the copy constructor, copy assignment operator, move constructor, move assignment operator, and destructor are defined, then all of these functions are defined.
@@ -112,14 +113,15 @@ int main( int argc, char* args[] )
 			std::cout<< "PIEZA "<< pieza << " CREADA "<< std::endl;
 			pieza_bloqueada = false;
 
-			//Uint32 title_timestamp = SDL_GetTicks();
+			//Variables para gestionar la tasa de refresco
   			Uint32 frame_start;
   			Uint32 frame_end;
 			Uint32 frame_duration;
 
 
 			while(true){
-				frame_start = SDL_GetTicks();
+
+				frame_start = SDL_GetTicks();//Registro del tiempo de inicio del frame
 				while( SDL_PollEvent( &eventos ) != 0 ){ //Cola de eventos	
 					if( eventos.type == SDL_QUIT ){ //Para cerrar (pulsando X de ventana)
 						cerrar_programa = true;
@@ -146,11 +148,8 @@ int main( int argc, char* args[] )
 				}
 				Actualiza_Pantalla(*pieza, tablero_estatico, *siguiente_pieza); //renderizado de tablero con piezas fijas y actual pieza moviéndose
 				
+				// Para asegurar un refresco máximo de 60Hz
 				frame_end = SDL_GetTicks();
-
-    			// Keep track of how long each loop through the input/update/render cycle
-    			// takes.
-
     			frame_duration = frame_end - frame_start;
 				if (frame_duration < target_frame_duration) {
       				SDL_Delay(target_frame_duration - frame_duration);
@@ -187,7 +186,7 @@ void bajar_pieza_si_puede(Pieza* p_pieza){
 			Actualiza_Tablero_Estatico(*p_pieza, tablero_estatico);//borra filas ocupadas
 
 			std::cout<< "TABLERO ESTATICO COPIADO AL DINAMICO. ELIMINADO DE HUECOS "<<std::endl;
-			tablero_dinamico = tablero_estatico;
+			tablero_dinamico = tablero_estatico; //! MOVE SEMANTICS
 			tablero_estatico.imprime_tabla();//para debug en consola
 			pieza_bloqueada = true;
 			
@@ -218,7 +217,7 @@ void pedir_nombre(){
 	//Event handler
 	SDL_Event e;
 
-	SDL_StartTextInput(); //! HABILITA LA ENTRADA DE TEXTO
+	SDL_StartTextInput(); //Habilita la entrada de texto
 
 	//Para gestionar la tasa de refresco
   	Uint32 frame_start;
