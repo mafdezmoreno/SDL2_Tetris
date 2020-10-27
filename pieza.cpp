@@ -1,6 +1,6 @@
 #include "pieza.h"
 #include <time.h> 
-#include "main.h"
+#include "constantes.h"
 #include <random>
 #include <chrono>
 
@@ -21,7 +21,6 @@ void Pieza::Gira_Pieza_90(){
             x--;
         }
     }
-	
     posiciones = pieza_plus_90;
 }
 

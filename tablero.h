@@ -10,12 +10,11 @@
 class Tablero{
 	public:
 
-
         //Funciones de modificacion
         void intro_coord_tabla(Pieza &pieza); //ocupa el espacio de la tabla con las coordenadas de la pieza
         void borra_coord_tabla(Pieza &pieza); //libera el hueco tras el movimiento de la pieza. Solo necesario para una correcta visualización del tablero logico
-
         void imprime_tabla();   //imprime _tablero (lógico), con un "1" en casilla ocupada
+        void copiar_tableros(std::vector<std::vector<bool>> &dinamico, std::vector<std::vector<bool>> &estatico);
 
         //Comprobaciones de cabida/movimiento
         bool comprueba_cabe_pieza(Pieza &pieza);  //actualiza posición de pieza y comprueba si cabe en nueva posición
@@ -29,12 +28,14 @@ class Tablero{
     
     //VARIABLES
         std::vector<std::vector<bool>> _tablero; //Posiciones ocupadas del tablero
-        bool** _tabla;
+        bool** _tabla; //posiciones ocupadas por el tablero
 
         //RULE OF FIVE
 
-        //! Constructor
+        //! Default constructor
         Tablero();
+        //! Constructor
+        Tablero(int* puntuacion, int* nivel);
         //! Destructor
         ~Tablero();
         //! Copy constructor
@@ -52,7 +53,6 @@ class Tablero{
         //Variables
         //! TO DO (mejora): INCLUIR CÓDIGO COLOR A CADA POSICIÓN
 		
-        //SDL_sem* gDataLock = NULL;
 
         //Funciones que usa eliminar_filas_llenas();
         bool comprobar_fila_llena(int fila);
@@ -63,6 +63,11 @@ class Tablero{
 
         //Cambia el valor de una casilla de _tablero
         int set_cuadro (Coordenada &coordenada, bool tipo);
+
+        void _init_tablero();
+
+        int* _nivel;
+        int* _puntuacion;
 };
 
 #endif

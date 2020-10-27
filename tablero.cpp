@@ -1,38 +1,19 @@
 #include "tablero.h"
-#include "main.h"
-//#include <SDL_thread.h>
+#include "constantes.h"
 
-Tablero::Tablero(){ //! Constructor
+
+Tablero::Tablero(){ //! Default Constructor
 	
-/* https://stackoverflow.com/questions/3904224/declaring-a-pointer-to-multidimensional-array-and-allocating-the-array/3904306#3904306
-int width = 5;
-int height = 5;
-int** arr = new int*[width];
-for(int i = 0; i < width; ++i)
-   arr[i] = new int[height];
-*/
+    _init_tablero();
 
-    _tabla = new bool*[FILAS+2];
-    for (int fila = 0 ; fila < (FILAS+2) ; fila++){
-        _tabla[fila] =  new bool[COLUMNAS+2];
-        for( int columna = 0 ; columna < (COLUMNAS+2) ; columna++){
-            if(fila == 0 || fila == FILAS +1 || columna == 0 || columna == COLUMNAS+1)
-				_tabla[fila][columna] = true;
-			else
-				_tabla[fila][columna] = false;
-        }
-    }
+}
 
-    _tablero.resize(FILAS+2);
-	for (int fila = 0 ; fila < (FILAS+2) ; fila++){
-				_tablero[fila].resize(COLUMNAS+2);
-				for( int columna = 0 ; columna < (COLUMNAS+2) ; columna++){
-					if(fila == 0 || fila == FILAS +1 || columna == 0 || columna == COLUMNAS+1)
-						_tablero[fila][columna] = true;
-					else
-						_tablero[fila][columna] = false;
-				}
-	}
+Tablero::Tablero(int * puntuacion, int * nivel){ //! Constructor
+	
+    _init_tablero();
+    _nivel = nivel;
+    _puntuacion = puntuacion;
+
 }
 
 Tablero::~Tablero(){ //! Destructor
@@ -42,18 +23,16 @@ Tablero::~Tablero(){ //! Destructor
         delete [] _tabla[fila];
     }
     delete[] _tabla;
-	//std::cout<< "Tabla "<< this << " destruida" << std::endl;
-	//imprime_tabla();
-    //Free semaphore
-    //SDL_DestroySemaphore( gDataLock );
-    //gDataLock = NULL;
 }
 
 
 Tablero::Tablero(Tablero& original)  //! Copy constructor
 {
 
-    _tablero = original._tablero;
+    //_tablero = original._tablero; //! shallow copy !esto solo copia las direcciones
+    //Deep copy
+    copiar_tableros(_tablero, original._tablero);
+
 
     _tabla = new bool*[FILAS+2];
     for (int fila = 0 ; fila < (FILAS+2) ; fila++){
@@ -63,18 +42,6 @@ Tablero::Tablero(Tablero& original)  //! Copy constructor
         }
     }
 }
-/*
-        rule_five_string(rule_five_string& original) 
-            :longitud{original.longitud},
-            buffer{new char[original.longitud]}
-            {
-            std::strncpy(buffer, original.buffer, longitud);
-            std::cout<< "Copy Constructor: ";
-            imprime_this();
-        }
-*/
-
-
 
 
 Tablero::Tablero(Tablero&& original) noexcept //! Move constructor
@@ -91,11 +58,15 @@ Tablero& Tablero::operator=(Tablero& original){ //! Copy Assignment operator
 
     if (this == &original) return *this; //protección autocopia
 
-     std::vector<std::vector<bool>> empty_vector;
-    _tablero.swap(empty_vector); //swap whit empty vector to clear
+    //std::vector<std::vector<bool>> empty_vector;
+    //_tablero.swap(empty_vector); //swap whit empty vector to clear
     
     //realiza todas las copias de las variables de original
-    _tablero = original._tablero;
+    //! Esto solo copia las direcciones
+    //_tablero = original._tablero;
+
+    //Deep copy
+    copiar_tableros(_tablero, original._tablero);
   
     return *this;
 }
@@ -118,6 +89,24 @@ Tablero& Tablero::operator=(Tablero&& original) noexcept{ //! Move Assignmet ope
 }
 
 
+void Tablero::copiar_tableros(std::vector<std::vector<bool>> &dinamico, std::vector<std::vector<bool>> &estatico){
+    
+    bool fila_contenido = true;
+    for (int fila = 1 ; fila < (FILAS+1) ; fila++){
+        for( int columna = 1 ; columna < (COLUMNAS+1) ; columna++){
+            dinamico[fila][columna] = estatico[fila][columna];
+            if(estatico[fila][columna]==1){
+                fila_contenido = true;
+            }
+            else
+            {
+                fila_contenido = false;
+            }
+        }
+        if(fila_contenido)
+            break; //Termina el bucle si ya no tiene más contenido la tabla
+    }
+}
 
 bool Tablero::Comprueba_bajada(Pieza &pieza){
     
@@ -189,9 +178,7 @@ bool Tablero::comprueba_cabe_pieza(Pieza &pieza){ //devuelve true si cabe y fals
 
 void Tablero::imprime_tabla(){
     		
-    //SDL_SemWait( gDataLock ); //para evitar impresiones que corten la tabla
-    //std::cout<<"Tablero "<<this<< " gDataLock "<< gDataLock <<std::endl;
-    //system("cls");
+    std::cout<<"Tablero "<<this<<std::endl;
     std::cout<<"   ";
     for ( int i = 0 ; i < COLUMNAS+2 ; i++){
         if (i<10)
@@ -241,7 +228,7 @@ int Tablero::set_cuadro (Coordenada &coordenada, bool tipo){ // horizontal (fila
 }
 
 void Tablero::intro_coord_tabla(Pieza &pieza){
-    std::cout<<"Pieza "<< &pieza <<" introducida en la tabla"<<std::endl;
+    std::cout<<"Pieza "<< &pieza <<" introducida en la tabla "<< this <<std::endl;
     for ( int i = 0 ; i < pieza.set_coordenadas.size() ; i++)     //vertical
         set_cuadro (pieza.set_coordenadas[i] , true);
 }
@@ -331,10 +318,10 @@ void Tablero::eliminar_filas_llenas(){
             compactar_filas_tabla(filas_llenas[i]+contador_filas_eliminadas);
             contador_filas_eliminadas++;
         }
-        puntuacion = puntuacion + contador_filas_eliminadas;
-        if(((int)(puntuacion/10))>(nivel)){
-            nivel++;
-            std::cout<<"Has subido al nivel: "<< nivel <<std::endl;
+        *_puntuacion = *_puntuacion + contador_filas_eliminadas;
+        if(((int)(*_puntuacion/10))>(*_nivel)){
+            *_nivel++;
+            std::cout<<"Has subido al nivel: "<< *_nivel <<std::endl;
         }
     }
     else
@@ -343,3 +330,38 @@ void Tablero::eliminar_filas_llenas(){
     }
     
 }
+
+void Tablero::_init_tablero(){
+
+    /* https://stackoverflow.com/questions/3904224/declaring-a-pointer-to-multidimensional-array-and-allocating-the-array/3904306#3904306
+int width = 5;
+int height = 5;
+int** arr = new int*[width];
+for(int i = 0; i < width; ++i)
+   arr[i] = new int[height];
+*/
+
+    _tabla = new bool*[FILAS+2];
+    for (int fila = 0 ; fila < (FILAS+2) ; fila++){
+        _tabla[fila] =  new bool[COLUMNAS+2];
+        for( int columna = 0 ; columna < (COLUMNAS+2) ; columna++){
+            if(fila == 0 || fila == FILAS +1 || columna == 0 || columna == COLUMNAS+1)
+				_tabla[fila][columna] = true;
+			else
+				_tabla[fila][columna] = false;
+        }
+    }
+
+    _tablero.resize(FILAS+2);
+	for (int fila = 0 ; fila < (FILAS+2) ; fila++){
+				_tablero[fila].resize(COLUMNAS+2);
+				for( int columna = 0 ; columna < (COLUMNAS+2) ; columna++){
+					if(fila == 0 || fila == FILAS +1 || columna == 0 || columna == COLUMNAS+1)
+						_tablero[fila][columna] = true;
+					else
+						_tablero[fila][columna] = false;
+				}
+	}
+
+}
+
