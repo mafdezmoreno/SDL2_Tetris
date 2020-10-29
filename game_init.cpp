@@ -2,13 +2,14 @@
 #include "constantes.h"
 #include <iostream>
 
-Game_Init::Game_Init(){ //Constructor
+Game_Init::Game_Init()
+	: _Ventana(nullptr, SDL_DestroyWindow) , _Render (nullptr, SDL_DestroyRenderer) { //Constructor
 
 	std::cout<<"\nGame Init Constructor" << this <<std::endl; 
     if(inicializar()){
-		_pedir_nombre_jugador = new Texto("Introduce tu nombre:", _Render);
-		_Nombre_Jugador_Temp = new Texto("Jugador 1", _Render);
-		_pulsa_intro_continuar = new Texto("Pulsa Enter para continuar",_Render);
+		_pedir_nombre_jugador = new Texto("Introduce tu nombre:", _Render.get());
+		_Nombre_Jugador_Temp = new Texto("Jugador 1", _Render.get());
+		_pulsa_intro_continuar = new Texto("Pulsa Enter para continuar",_Render.get());
 		pantalla_pedir_nombre();
 	}
 }
@@ -88,8 +89,8 @@ void Game_Init::pantalla_pedir_nombre(){
 		}
 
 		//Clear screen
-		SDL_SetRenderDrawColor( _Render, 0xFF, 0xFF, 0xFF, 0xFF );
-		SDL_RenderClear( _Render );
+		SDL_SetRenderDrawColor( _Render.get(), 0xFF, 0xFF, 0xFF, 0xFF );
+		SDL_RenderClear( _Render.get() );
 
 		//Render text textures
 		_pedir_nombre_jugador->renderizar( (ANCHO - _pedir_nombre_jugador->get_ancho())/2, REJILLA );
@@ -97,7 +98,7 @@ void Game_Init::pantalla_pedir_nombre(){
 		_pulsa_intro_continuar->renderizar ( (ANCHO - _pulsa_intro_continuar->get_ancho())/2 , 5*REJILLA );
 
 		//Update screen
-		SDL_RenderPresent( _Render );
+		SDL_RenderPresent( _Render.get() );
 
 		frame_end = SDL_GetTicks();
     	frame_duration = frame_end - frame_start;
@@ -115,14 +116,16 @@ void Game_Init::pantalla_pedir_nombre(){
 	if( inputText != "" )
 	{
 		//Render new text
-		_Nombre_Jugador_Temp->cargar_texto_renderizado( inputText.c_str());
+		_Nombre_Jugador_Temp->cargar_texto_renderizado(inputText);
+		//_Nombre_Jugador_Temp->set_cadena_texto(&inputText);
 	}
 	//Text is empty
 	else
 	{
 		//Render space texture
 		inputText = "Jugador 1";
-		_Nombre_Jugador_Temp->cargar_texto_renderizado(inputText.c_str());
+		_Nombre_Jugador_Temp->cargar_texto_renderizado(inputText);
+		//_Nombre_Jugador_Temp->set_cadena_texto(&inputText);
 	}	
 
 	std::cout<< "Nombre del jugador: "<< inputText << std::endl;
@@ -145,7 +148,7 @@ bool Game_Init::inicializar()
 			std::cout<<"SDL_SetHint Error"<<std::endl;
 
 		// Creación de la ventana
-		_Ventana = SDL_CreateWindow( "Tetris Udacity", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, ANCHO, ALTO, SDL_WINDOW_SHOWN );
+		_Ventana.reset(SDL_CreateWindow( "Tetris Udacity", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, ANCHO, ALTO, SDL_WINDOW_SHOWN ));
 		if( _Ventana == NULL )
 		{
 			std::cout<< "SDL_CreateWindow Error: "<< SDL_GetError()  <<std::endl;
@@ -153,7 +156,7 @@ bool Game_Init::inicializar()
 		}
 		else
 		{
-			_Render = SDL_CreateRenderer( _Ventana, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
+			_Render.reset(SDL_CreateRenderer( _Ventana.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC ));
 			if( _Render == NULL )
 			{
 				std::cout<< "SDL_CreateRenderer Error: " << SDL_GetError() <<std::endl;
@@ -161,12 +164,12 @@ bool Game_Init::inicializar()
 			}
 			else
 			{
-				SDL_SetRenderDrawColor( _Render, 0xFF, 0xFF, 0xFF, 0xFF );
+				SDL_SetRenderDrawColor( _Render.get(), 0xFF, 0xFF, 0xFF, 0xFF );
 			}
 		}
 	}
 
-	if( TTF_Init() == -1 ){
+	if( TTF_Init() == -1 ){ //para renderizado de texto
 		std::cout<<"No se ha podido inicializar TTF_Init() "<< TTF_GetError() <<std::endl;
 		correcto = false;
 	}

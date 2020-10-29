@@ -3,6 +3,7 @@
 
 #include "texto.h"
 #include <SDL.h>
+#include <memory>
 
 class Game_Init{
 
@@ -13,15 +14,19 @@ class Game_Init{
         bool inicializar();
         Texto * get_nombre_jugador();
 
-        SDL_Window*   _Ventana = NULL;     // Ventana
-        SDL_Renderer* _Render = NULL; // Elementos a renderizar en interior
+        // https://stackoverflow.com/questions/48672399/is-it-possible-to-use-sdl2-with-smart-pointers
+        //SDL_Window*   _Ventana;     // Ventana`
+        std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> _Ventana;
+        //SDL_Renderer* _Render; // Elementos a renderizar en interior
+        std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> _Render;
+
+        
 
     private:
 
         Texto * _pedir_nombre_jugador;
         Texto * _Nombre_Jugador_Temp;
         Texto * _pulsa_intro_continuar;
-
 
         static constexpr std::size_t _kFramesPerSecond{30};
         static constexpr std::size_t _kMsPerFrame{1000 / _kFramesPerSecond};

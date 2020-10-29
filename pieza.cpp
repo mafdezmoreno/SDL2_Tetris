@@ -78,7 +78,7 @@ void Pieza::_inicializacion_pieza(){
 
     //Mejora la aleatoriedad
     std::mt19937 gen1(seed); // seed the generator
-    std::uniform_int_distribution<> distr1(2, COLUMNAS-2); // define the range
+    std::uniform_int_distribution<> distr1(2, COLUMNAS-2-posiciones[0].size()); // define the range
     coordenada.x_columna = distr1(gen1);
 
     std::mt19937 gen2(seed); // seed the generator

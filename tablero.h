@@ -2,6 +2,7 @@
 #define TABLERO_H
 
 #include "pieza.h"
+#include <vector>
 
 //Initialize semaphore
 

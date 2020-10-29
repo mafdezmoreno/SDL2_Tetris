@@ -19,7 +19,7 @@ find_package(SDL2 REQUIRED)
 find_package (Threads REQUIRED) #Para que encuentre las librerías necesarias de multi-hilo
 include_directories(${SDL2_INCLUDE_DIRS})
 
-add_executable(${CMAKE_PROJECT_NAME} main.cpp game_init.cpp game.cpp texto.cpp tablero.cpp pieza.cpp)
+add_executable(${CMAKE_PROJECT_NAME} main.cpp game_init.cpp game.cpp game_close.cpp texto.cpp tablero.cpp pieza.cpp)
 
 
 ## INCLUSIÓN DE LAS LIBRERIAS SLD2 NECESARIAS

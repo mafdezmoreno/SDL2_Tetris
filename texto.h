@@ -24,10 +24,9 @@ class Texto
 			SDL_RenderCopyEx( _Render, _Textura, nullptr, &Cuadrado, 0, nullptr, SDL_FLIP_NONE );
 		}
 
-		
 		int get_ancho();
-		//int get_alto();
-		std::string * get_cadena_texto();
+		std::string get_cadena_texto();
+		void set_cadena_texto(std::string texto);
 		void cargar_texto(std::string inputText);
 
 	// Rule of five implementation: https://cpppatterns.com/patterns/rule-of-five.html#line7
@@ -35,7 +34,7 @@ class Texto
 		//! Default Constructor
 		Texto(SDL_Renderer* ext_render);
 		//! Constructor
-		Texto(std::string &&texto_renderizar, SDL_Renderer* ext_render);
+		Texto(std::string texto_renderizar, SDL_Renderer* ext_render);
 		//Copy Costructor
 	    Texto(const Texto& original);
 		//Copy assignment operator
@@ -52,8 +51,7 @@ class Texto
 		SDL_Renderer* _Render = NULL;
 		TTF_Font * Fuente_TTF = TTF_OpenFont("FreeSansBold.ttf", 16);
 		void liberar();	//libera los recursos reservados
-		std::string* _cadena_texto;
-		//const char* _cadena_texto;
+		std::string _cadena_texto;
 		SDL_Texture* _Textura;
 		int _ancho;
 		int _alto;

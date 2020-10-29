@@ -8,7 +8,6 @@ Texto::Texto(SDL_Renderer* ext_render)
 {
 	_Render = ext_render;
 	_Textura = nullptr;
-	_cadena_texto = nullptr;
 	_ancho = 0;
 	_alto = 0;
 	std::cout << "Texto Default Constructor " << this << ": "<<std::endl;
@@ -17,11 +16,12 @@ Texto::Texto(SDL_Renderer* ext_render)
 
 
 //! Constructor
-Texto::Texto(std::string &&texto_renderizar, SDL_Renderer* ext_render)
+Texto::Texto(std::string texto_renderizar, SDL_Renderer* ext_render)
+//Texto::Texto(const char * texto_renderizar, SDL_Renderer* ext_render){
 {
+
 	_Render = ext_render;
 	_Textura = nullptr;
-	_cadena_texto = nullptr;
 	_ancho = 0;
 	_alto = 0;
 	cargar_texto(texto_renderizar);
@@ -31,6 +31,7 @@ Texto::Texto(std::string &&texto_renderizar, SDL_Renderer* ext_render)
 }
 
 void Texto::cargar_texto(std::string inputText)
+//void Texto::cargar_texto(char inputText)
 {
 	if( Fuente_TTF == NULL ){
 		std::cout<< "Error en la carga de la fuente. SDL_ttf Error: " << TTF_GetError()  <<std::endl;
@@ -89,8 +90,8 @@ Texto& Texto::operator=(Texto&& original) noexcept{
 	if (this == &original)  // prevención auto asignación
     	return *this;
 	
-	if(!_cadena_texto)
-		delete _cadena_texto;
+	//if(!_cadena_texto)
+	//	delete _cadena_texto;
 
 	_cadena_texto = original._cadena_texto;
 	_ancho = original._ancho;
@@ -108,36 +109,15 @@ Texto& Texto::operator=(Texto&& original) noexcept{
 //! Destructor
 Texto::~Texto()
 {
-	std::cout << "Texto DESTRUCTOR TEXTO " << this << ": ";
-	
-	if( _cadena_texto != nullptr )
-	{
-		//std::cout << *_cadena_texto <<std::endl;	
-	}
-	
-	liberar();
+	std::cout << "DESTRUCTOR TEXTO " << this << std::endl;
 }
-void Texto::liberar() //Reinicia el contenido para el siguiente renderizado
-{
-	if( _Textura != nullptr )
-	{
-		SDL_DestroyTexture( _Textura );
-		_Textura = nullptr;
-		_ancho = 0;
-		_alto = 0;
-	}
-	if( _cadena_texto != nullptr )
-	{
-		_cadena_texto = nullptr;
-	}
-	
-}
+
 
 bool Texto::cargar_texto_renderizado(std::string texto_renderizar)
 {
 
-	_cadena_texto = &texto_renderizar;
-	liberar();
+	_cadena_texto = texto_renderizar;
+	std::cout<< "Cadena de texto a renderizar: " << _cadena_texto<<std::endl;
 	SDL_Surface* Texto_Surface = TTF_RenderText_Blended( Fuente_TTF, texto_renderizar.c_str(),  {0,0,0});
 	
 	if( Texto_Surface == nullptr )
@@ -168,13 +148,12 @@ int Texto::get_ancho()
 	return _ancho;
 }
 
-/*
-int Texto::get_alto()
-{
-	return _alto;
-}*/
-
-std::string * Texto::get_cadena_texto(){
+std::string Texto::get_cadena_texto(){
 
 	return _cadena_texto;
+}
+void Texto::set_cadena_texto(std::string texto){
+
+	std::cout<<"setted "<< texto << " on " <<this<< std::endl;
+	_cadena_texto = texto;
 }

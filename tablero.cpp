@@ -319,9 +319,11 @@ void Tablero::eliminar_filas_llenas(){
             contador_filas_eliminadas++;
         }
         *_puntuacion = *_puntuacion + contador_filas_eliminadas;
+        std::cout<<"Puntuacion: "<< *_puntuacion <<std::endl;
         if(((int)(*_puntuacion/10))>(*_nivel)){
-            *_nivel++;
+            *_nivel = *_nivel + 1;
             std::cout<<"Has subido al nivel: "<< *_nivel <<std::endl;
+            
         }
     }
     else
