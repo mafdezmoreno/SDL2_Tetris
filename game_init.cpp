@@ -3,30 +3,33 @@
 #include <iostream>
 
 Game_Init::Game_Init()
-	: _Ventana(nullptr, SDL_DestroyWindow) , _Render (nullptr, SDL_DestroyRenderer) { //Constructor
+	: _Ventana(nullptr, SDL_DestroyWindow) ,
+	  _Render (nullptr, SDL_DestroyRenderer) { //Constructor
 
 	std::cout<<"\nGame Init Constructor" << this <<std::endl; 
     if(inicializar()){
-		_pedir_nombre_jugador = new Texto("Introduce tu nombre:", _Render.get());
-		_Nombre_Jugador_Temp = new Texto("Jugador 1", _Render.get());
-		_pulsa_intro_continuar = new Texto("Pulsa Enter para continuar",_Render.get());
+		_pedir_nombre_jugador = std::make_unique<Texto> ("Introduce tu nombre:", _Render.get());
+		_Nombre_Jugador_Temp = std::make_unique<Texto>("Jugador 1", _Render.get());
+		_pulsa_intro_continuar = std::make_unique<Texto> ("Pulsa Enter para continuar",_Render.get());
 		pantalla_pedir_nombre();
 	}
 }
 
 
-
 Game_Init::~Game_Init(){
 
-    delete _pedir_nombre_jugador;
-    delete _Nombre_Jugador_Temp;
-    delete _pulsa_intro_continuar;
 	std::cout<<"Game Init Destructor Called " << this<< "\n" <<std::endl;
 }
 
-Texto * Game_Init::get_nombre_jugador(){
+std::unique_ptr<Texto> Game_Init::get_nombre_jugador(){
 
-	return _Nombre_Jugador_Temp;
+	return std::move(_Nombre_Jugador_Temp);
+}
+
+
+std::unique_ptr<Texto> Game_Init::get_pulsa_intro_continuar(){
+	
+	return std::move(_pulsa_intro_continuar);
 }
 
 

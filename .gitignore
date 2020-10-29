@@ -8,6 +8,7 @@ test_functions/
 cmake_install.cmake
 CMakeCache.txt
 
+*.bak
 # Compiled source #
 ###################
 *.com

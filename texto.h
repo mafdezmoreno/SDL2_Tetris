@@ -53,8 +53,8 @@ class Texto
 		void liberar();	//libera los recursos reservados
 		std::string _cadena_texto;
 		SDL_Texture* _Textura;
-		int _ancho;
-		int _alto;
+		int _ancho{0};
+		int _alto{0};
 		
 };
 

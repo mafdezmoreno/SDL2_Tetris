@@ -8,28 +8,36 @@
 
 Game_Close::Game_Close(Game * game, Game_Init * game_init)
 	: _Ventana(nullptr, SDL_DestroyWindow) ,
-	 _Render (nullptr, SDL_DestroyRenderer){
+	  _Render (nullptr, SDL_DestroyRenderer){
 
 	std::cout<<"Game_Close Construido "<<this<< std::endl;
 	
-	_Texto_Jugador = game->_Texto_Jugador;
-    _Nombre_Jugador = game->_Nombre_Jugador;
-    _Texto_Puntuacion = game->_Texto_Puntuacion;
-    _Valor_Puntuacion = game->_Valor_Puntuacion;
-    _Texto_Nivel = game ->_Texto_Nivel;
-    _Valor_Nivel = game -> _Valor_Nivel;
-	_pulsa_intro_continuar = game_init -> get_nombre_jugador();
-
+	_Texto_Jugador = game->get_Texto_Jugador();
+    _Nombre_Jugador = game->get_nombre_jugador();
+    _Texto_Puntuacion = game->get_Texto_Puntuacion();
+    _Valor_Puntuacion = game->get_Valor_Puntuacion();
+    _Texto_Nivel = game ->get_Texto_Nivel();
+    _Valor_Nivel = game ->get_Valor_Nivel();
+	
+	_pulsa_intro_continuar = game_init -> get_pulsa_intro_continuar();
+	
 	_Ventana = std::move(game->_Ventana);     // Ventana
 	_Render = std::move(game ->_Render);      // Elementos a renderizar en interior
-
-	_puntuacion = game->get_puntuacion();
-	_nivel = game->get_nivel();
-	_nombre = _Nombre_Jugador->get_cadena_texto();
-
 	
+	_puntuacion = game->get_puntuacion();
+
+	_nivel = game->get_nivel();
+
+	_nombre = _Nombre_Jugador->get_cadena_texto();
+	std::cout<<"A "<<this<< std::endl;
+
 	mostrar_puntuacion();
+	
+	std::cout<<"B "<<this<< std::endl;
+
 	registar_puntuacion();
+	std::cout<<"C "<<this<< std::endl;
+
 }
 
 
@@ -47,10 +55,10 @@ void Game_Close::mostrar_puntuacion(){
 	//Reinicia la ventana
 	SDL_SetRenderDrawColor( _Render.get(), 0xFF, 0xFF, 0xFF, 0xFF );
 	SDL_RenderClear( _Render.get() );
-		
+
 	_Texto_Jugador->renderizar ( 3*REJILLA , 2*REJILLA );
 	_Nombre_Jugador->renderizar ( ANCHO - _Nombre_Jugador->get_ancho() - 3*REJILLA, 3*REJILLA );
-		
+
 	_Texto_Puntuacion->renderizar ( 3*REJILLA , 5*REJILLA );
 	_Valor_Puntuacion->renderizar ( ANCHO - _Valor_Puntuacion->get_ancho() - 3*REJILLA , 6*REJILLA );
 

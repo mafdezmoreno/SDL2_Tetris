@@ -3,10 +3,10 @@
 
 #include "pieza.h"
 #include <vector>
+#include "game.h"
+#include <memory>
 
-//Initialize semaphore
-
-//! Cambiar _tablero a dinamic raw pointer
+class Interrupt_Param;
 
 class Tablero{
 	public:
@@ -26,17 +26,14 @@ class Tablero{
 
         //Compactado tabla
         void eliminar_filas_llenas();
-    
-    //VARIABLES
-        std::vector<std::vector<bool>> _tablero; //Posiciones ocupadas del tablero
-        bool** _tabla; //posiciones ocupadas por el tablero
 
-        //RULE OF FIVE
+        //get value position
+        bool get_position(int fila, int columna);
 
         //! Default constructor
         Tablero();
         //! Constructor
-        Tablero(int* puntuacion, int* nivel);
+        Tablero(std::shared_ptr<Interrupt_Param> param);
         //! Destructor
         ~Tablero();
         //! Copy constructor
@@ -51,10 +48,6 @@ class Tablero{
 
     private:
 
-        //Variables
-        //! TO DO (mejora): INCLUIR CÓDIGO COLOR A CADA POSICIÓN
-		
-
         //Funciones que usa eliminar_filas_llenas();
         bool comprobar_fila_llena(int fila);
         bool comprobar_fila_vacia(int fila);
@@ -64,11 +57,11 @@ class Tablero{
 
         //Cambia el valor de una casilla de _tablero
         int set_cuadro (Coordenada &coordenada, bool tipo);
-
         void _init_tablero();
 
-        int* _nivel;
-        int* _puntuacion;
+        //variables
+        std::shared_ptr<Interrupt_Param> _incrementar_puntuacion;
+        std::vector<std::vector<bool>> _tablero; //Posiciones ocupadas del tablero
 };
 
 #endif

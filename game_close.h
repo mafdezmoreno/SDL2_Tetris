@@ -14,20 +14,20 @@ class Game_Close{
 
         Game_Close(Game * game,  Game_Init * game_init);
 
-        void registar_puntuacion();
-        void mostrar_puntuacion();
+        void registar_puntuacion(); //Registra puntuacion a un .txt
+        void mostrar_puntuacion();  //Muesta la ventana con la info
 
         ~Game_Close();
 
     private:
-        SDL_Event* _eventos;
-        Texto* _Texto_Jugador;
-        Texto* _Nombre_Jugador;
-        Texto* _Texto_Puntuacion;
-        Texto* _Valor_Puntuacion;
-        Texto* _Texto_Nivel;
-        Texto* _Valor_Nivel;
-        Texto* _pulsa_intro_continuar;
+      
+        std::unique_ptr<Texto> _Texto_Jugador;
+        std::unique_ptr<Texto> _Nombre_Jugador;
+        std::unique_ptr<Texto> _Texto_Puntuacion;
+        std::unique_ptr<Texto> _Valor_Puntuacion;
+        std::unique_ptr<Texto> _Texto_Nivel;
+        std::unique_ptr<Texto> _Valor_Nivel;
+        std::unique_ptr<Texto> _pulsa_intro_continuar;
 
         const int * _puntuacion;
         const int * _nivel;

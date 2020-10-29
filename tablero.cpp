@@ -5,42 +5,24 @@
 Tablero::Tablero(){ //! Default Constructor
 	
     _init_tablero();
-
 }
 
-Tablero::Tablero(int * puntuacion, int * nivel){ //! Constructor
+Tablero::Tablero(std::shared_ptr<Interrupt_Param> param){ //! Constructor
 	
     _init_tablero();
-    _nivel = nivel;
-    _puntuacion = puntuacion;
-
+    _incrementar_puntuacion = param;
 }
 
 Tablero::~Tablero(){ //! Destructor
 
-    //https://stackoverflow.com/questions/30720594/deleting-a-dynamically-allocated-2d-array
-    for (int fila = 0 ; fila < (FILAS+2) ; fila++){
-        delete [] _tabla[fila];
-    }
-    delete[] _tabla;
+    std::cout << "Tablero "<< this << " Destruido" <<std::endl;
 }
 
 
 Tablero::Tablero(Tablero& original)  //! Copy constructor
 {
-
-    //_tablero = original._tablero; //! shallow copy !esto solo copia las direcciones
     //Deep copy
     copiar_tableros(_tablero, original._tablero);
-
-
-    _tabla = new bool*[FILAS+2];
-    for (int fila = 0 ; fila < (FILAS+2) ; fila++){
-        _tabla[fila] =  new bool[COLUMNAS+2];
-        for( int columna = 0 ; columna < (COLUMNAS+2) ; columna++){
-            _tabla[fila][columna] = original._tabla[fila][columna];
-        }
-    }
 }
 
 
@@ -48,7 +30,6 @@ Tablero::Tablero(Tablero&& original) noexcept //! Move constructor
 {
     _tablero = original._tablero;
     //https://stackoverflow.com/questions/13679635/how-to-properly-destroy-c-vector-of-vectors-and-release-memory
-    
     std::vector<std::vector<bool>> empty_vector;
     original._tablero.swap(empty_vector); //swap whit empty vector to clear
     original._tablero.clear();
@@ -57,13 +38,6 @@ Tablero::Tablero(Tablero&& original) noexcept //! Move constructor
 Tablero& Tablero::operator=(Tablero& original){ //! Copy Assignment operator
 
     if (this == &original) return *this; //protección autocopia
-
-    //std::vector<std::vector<bool>> empty_vector;
-    //_tablero.swap(empty_vector); //swap whit empty vector to clear
-    
-    //realiza todas las copias de las variables de original
-    //! Esto solo copia las direcciones
-    //_tablero = original._tablero;
 
     //Deep copy
     copiar_tableros(_tablero, original._tablero);
@@ -110,7 +84,6 @@ void Tablero::copiar_tableros(std::vector<std::vector<bool>> &dinamico, std::vec
 
 bool Tablero::Comprueba_bajada(Pieza &pieza){
     
-    //SDL_SemWait( gDataLock );
     Pieza buffer = pieza; //el compilador se encarga de hacer la copia (más adelante implementar move semantics)
     buffer.coordenada.y_fila = buffer.coordenada.y_fila + 1; //bajo la pieza copiada
     buffer.pieza_a_coordenadas(); //actualizo el set de coordenadas de la pieza
@@ -120,7 +93,6 @@ bool Tablero::Comprueba_bajada(Pieza &pieza){
         return true;
     }
     std::cout<<"La pieza " << &pieza <<" no puede bajar "<<std::endl;
-    //SDL_SemPost( gDataLock );
     return false;
 
 }
@@ -205,25 +177,13 @@ void Tablero::imprime_tabla(){
         }
     	std::cout<<std::endl;
     }
-    //SDL_SemPost( gDataLock );
-}
 
+}
 
 
 int Tablero::set_cuadro (Coordenada &coordenada, bool tipo){ // horizontal (fila) // vertical (columna)
 
-    /*
-    if (coordenada.x_columna>COLUMNAS){
-        std::cout<<"Te sales del ancho"<<std::endl;
-        return 1;
-    }
-    if (coordenada.y_fila>FILAS){
-        std::cout<<"Te sales del alto"<<std::endl;
-        return 2;
-    }*/
     _tablero[coordenada.y_fila][coordenada.x_columna] = tipo;
-    //std::cout<< "Tabla actualizada en {y_fila, x_columna}: {"<< coordenada.y_fila << ",  "<<coordenada.x_columna<<"}"<<std::endl;
-
     return 0;
 }
 
@@ -297,7 +257,6 @@ void Tablero::compactar_filas_tabla(int fila){
             break;
         }
     }
-    //if ((!comprobar_fila_vacia(i))||(i==1)){
     if(i==1){ //elimina la fila superior si tiene algún contenido tras el compactado
         int j = i;
         for(int i = 1; i<(_tablero[0].size()-1); i++)
@@ -318,11 +277,13 @@ void Tablero::eliminar_filas_llenas(){
             compactar_filas_tabla(filas_llenas[i]+contador_filas_eliminadas);
             contador_filas_eliminadas++;
         }
-        *_puntuacion = *_puntuacion + contador_filas_eliminadas;
-        std::cout<<"Puntuacion: "<< *_puntuacion <<std::endl;
-        if(((int)(*_puntuacion/10))>(*_nivel)){
-            *_nivel = *_nivel + 1;
-            std::cout<<"Has subido al nivel: "<< *_nivel <<std::endl;
+        
+        _incrementar_puntuacion->puntuacion = _incrementar_puntuacion->puntuacion + contador_filas_eliminadas;
+
+        std::cout<<"Puntuacion: "<< _incrementar_puntuacion->puntuacion <<std::endl;
+        if(((int)(_incrementar_puntuacion->puntuacion/10))>(_incrementar_puntuacion->nivel)){
+            _incrementar_puntuacion->nivel = _incrementar_puntuacion->nivel + 1;
+            std::cout<<"Has subido al nivel: "<< _incrementar_puntuacion->nivel <<std::endl;
             
         }
     }
@@ -335,25 +296,6 @@ void Tablero::eliminar_filas_llenas(){
 
 void Tablero::_init_tablero(){
 
-    /* https://stackoverflow.com/questions/3904224/declaring-a-pointer-to-multidimensional-array-and-allocating-the-array/3904306#3904306
-int width = 5;
-int height = 5;
-int** arr = new int*[width];
-for(int i = 0; i < width; ++i)
-   arr[i] = new int[height];
-*/
-
-    _tabla = new bool*[FILAS+2];
-    for (int fila = 0 ; fila < (FILAS+2) ; fila++){
-        _tabla[fila] =  new bool[COLUMNAS+2];
-        for( int columna = 0 ; columna < (COLUMNAS+2) ; columna++){
-            if(fila == 0 || fila == FILAS +1 || columna == 0 || columna == COLUMNAS+1)
-				_tabla[fila][columna] = true;
-			else
-				_tabla[fila][columna] = false;
-        }
-    }
-
     _tablero.resize(FILAS+2);
 	for (int fila = 0 ; fila < (FILAS+2) ; fila++){
 				_tablero[fila].resize(COLUMNAS+2);
@@ -364,6 +306,9 @@ for(int i = 0; i < width; ++i)
 						_tablero[fila][columna] = false;
 				}
 	}
-
 }
 
+bool Tablero::get_position(int fila, int columna){
+
+    return _tablero[fila][columna];
+}

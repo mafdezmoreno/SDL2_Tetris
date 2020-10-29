@@ -16,21 +16,17 @@ Game::Game(Game_Init * game_start)//, Interrupt_Param * param)
 		_Ventana = std::move(game_start->_Ventana);     // Ventana
         _Render = std::move(game_start->_Render); // Elementos a renderizar en interior
 
-		_Texto_Puntuacion = new Texto("Puntuacion: ", _Render.get());
-		_Valor_Puntuacion = new Texto( _Render.get());
-		_Texto_Nivel = new Texto("Nivel: " , _Render.get());
-		_Valor_Nivel = new Texto( _Render.get());
-		_Texto_Jugador = new Texto("Jugador: ", _Render.get());
+		_Texto_Puntuacion = std::make_unique<Texto>("Puntuacion: ", _Render.get());
+		_Valor_Puntuacion =std::make_unique<Texto>( _Render.get());
+		_Texto_Nivel = std::make_unique<Texto>("Nivel: ", _Render.get());
+		_Valor_Nivel = std::make_unique<Texto>( _Render.get());
+		_Texto_Jugador = std::make_unique<Texto>("Jugador: ", _Render.get());
 		_Nombre_Jugador = game_start->get_nombre_jugador();
 		
-		_nivel_previo = -1;
 		_params = std::make_shared<Interrupt_Param>();
 
-		_nivel = &((_params.get())->nivel);
-		_bajar_pieza = &((_params.get())->interrupt_control);
-		
-		_tablero_dinamico = new Tablero();
-		_tablero_estatico = new Tablero(&_puntuacion, _nivel);
+		_tablero_dinamico = std::make_unique<Tablero>();
+		_tablero_estatico = std::make_unique<Tablero>(_params);
 
 		std::cout << "GAME CONSTRUCTOR " << this << ": "<<std::endl;
 	}
@@ -40,12 +36,7 @@ Game::Game(Game_Init * game_start)//, Interrupt_Param * param)
 }
 
 Game::~Game(){
-    delete _Texto_Puntuacion;
-    delete _Texto_Nivel;
-    delete _Texto_Jugador;
-    delete _Nombre_Jugador;
-	delete _Valor_Puntuacion;
-	//delete _params;
+
 	std::cout << "GAME DESTRUCTOR " << this << ": "<<std::endl;
 }
 
@@ -105,7 +96,7 @@ void Game::Mueve_Pieza_Si_Se_Puede(const SDL_Keycode& tecla, Pieza &pieza, Table
 }
 
 
-void Game::Actualiza_Pantalla(Pieza &pieza, Tablero &tablero_estatico, Pieza &siguiente_pieza){
+void Game::Actualiza_Pantalla(Pieza &pieza, Pieza &siguiente_pieza){
 	
 	SDL_SetRenderDrawColor( _Render.get(), 200, 200, 200, 0xFF ); //Colores de la pantalla
 	SDL_RenderClear( _Render.get() ); //Limpia la pantalla
@@ -122,7 +113,6 @@ void Game::Actualiza_Pantalla(Pieza &pieza, Tablero &tablero_estatico, Pieza &si
 		}
 	}
 
-	//! PASAR LOS DOS SIGUIENTES BUCLES A FUNCION QUE ACEPTE UNA TABLA DE BOOLEANOS
 	//Renderizado de la pieza siguiente
 	for(int i = 0; i < siguiente_pieza.posiciones.size() ; i++){	
     	for(int j = 0; j<  siguiente_pieza.posiciones[0].size(); j++){
@@ -134,32 +124,34 @@ void Game::Actualiza_Pantalla(Pieza &pieza, Tablero &tablero_estatico, Pieza &si
 		}
 	}
 
-	//Renderizado de las posiciones ocupadas del tablero
-	for(int i = 1; i < (tablero_estatico._tablero.size()-1) ; i++){	
-    	for(int j = 1; j<  (tablero_estatico._tablero[0].size()-1); j++){
-			if (tablero_estatico._tablero[i][j]==true){
+	//Renderizado piezas ocupadas tabla
+	for(int i = FILAS; i >0  ; i--){	
+		bool fila_vacia = true;
+    	for(int j = 1; j<(COLUMNAS+1); j++){
+			if ((_tablero_estatico.get())->get_position(i,j)){			
 				SDL_Rect fillRect = {j*REJILLA, i*REJILLA, REJILLA, REJILLA};
 				SDL_SetRenderDrawColor( _Render.get(), colores[0][0], colores[0][1], colores[0][2], 0xFF );		
 				SDL_RenderFillRect( _Render.get(), &fillRect );
+				fila_vacia = false;
 			}
 		}
+		if(fila_vacia)
+			break;
 	}
 
-	if(puntuacion_previa!=_puntuacion){//Actualiza el texto de la puntuación
-		if(!_Valor_Puntuacion->cargar_texto_renderizado(std::to_string(_puntuacion))){
+	//Renderizado de texto
+	if(_params->puntuacion_previa!=_params->puntuacion){//Actualiza el texto de la puntuación
+		if(!_Valor_Puntuacion->cargar_texto_renderizado(std::to_string(_params->puntuacion))){
 			std::cout<< "No se ha podido renderizar el texto de la puntuación" <<std::endl;
 		}
-		//!
-		if(_nivel_previo!=(*_nivel)){ 
-			//std::string temp = std::to_string(*_nivel);
-			//std::ostringstream temp;
-			//temp << _nivel;
-			if(!_Valor_Nivel->cargar_texto_renderizado(std::to_string(*_nivel))){
+		if(_params->nivel_previo!=_params->nivel){
+
+			if(!_Valor_Nivel->cargar_texto_renderizado(std::to_string(_params->nivel))){
 				std::cout<< "No se ha podido renderizar el texto del nivel" <<std::endl;
 			}
-			_nivel_previo = *_nivel;
+			_params->nivel_previo!=_params->nivel;
 		}
-		puntuacion_previa = _puntuacion;
+		_params->puntuacion_previa=_params->puntuacion;
 	}
 
 	// Renderiza el texto
@@ -180,13 +172,9 @@ void Game::Actualiza_Pantalla(Pieza &pieza, Tablero &tablero_estatico, Pieza &si
 
 void Game::Actualiza_Tablero_Dinamico(Pieza &pieza, Tablero &tablero_din){
 
-		//if((pieza.coordenada.y_fila!=pieza.coordenada_previa.y_fila)||
-	//	(pieza.coordenada.x_columna!=pieza.coordenada_previa.x_columna)){ //si la pieza se mueve se actualiza posición
 		tablero_din.borra_coord_tabla(pieza); //borra la posición obsoleta de la tabla
 		pieza.pieza_a_coordenadas(); //Actualiza el set de coordenadas
-		tablero_din.intro_coord_tabla(pieza); //Introduce la pieza en la tabla
-	//}
-	
+		tablero_din.intro_coord_tabla(pieza); //Introduce la pieza en la tabla	
 }
 
 void Game::Actualiza_Tablero_Estatico(Pieza &pieza, Tablero &tablero){
@@ -194,7 +182,6 @@ void Game::Actualiza_Tablero_Estatico(Pieza &pieza, Tablero &tablero){
 	pieza.pieza_a_coordenadas(); //Actualiza el set de coordenadas
 	tablero.intro_coord_tabla(pieza); //Introduce la pieza en la tabla
 	tablero.eliminar_filas_llenas();
-	
 }
 
 Coordenada Game::Mapeado_Coord_Tablero(Coordenada &coord){
@@ -209,7 +196,6 @@ Coordenada Game::Mapeado_Coord_Tablero(Coordenada &coord){
 
 void Game::game_run(){
 
-	
 	//timer start
 	SDL_TimerID timerID = SDL_AddTimer(500, interrupcion, (void *)(_params.get()));
 
@@ -253,11 +239,11 @@ void Game::game_run(){
 				break;
 			if(tablero_lleno)
 				break;
-			if(*_bajar_pieza){
-				*_bajar_pieza = false;
+			if((_params.get())->interrupt_control){
+				(_params.get())->interrupt_control = false;
 				bajar_pieza_si_puede(pieza);
 			}
-				Actualiza_Pantalla(*pieza, *_tablero_estatico, *siguiente_pieza); //renderizado de tablero con piezas fijas y actual pieza moviéndose
+				Actualiza_Pantalla(*pieza, *siguiente_pieza); //renderizado de tablero con piezas fijas y actual pieza moviéndose
 				
 			// Para asegurar un refresco máximo de 60Hz
 			frame_end = SDL_GetTicks();
@@ -294,7 +280,6 @@ void Game::bajar_pieza_si_puede(Pieza* p_pieza){
 			Actualiza_Tablero_Estatico(*p_pieza, *_tablero_estatico);//borra filas ocupadas
 
 			std::cout<< "TABLERO ESTATICO COPIADO AL DINAMICO. ELIMINADO DE HUECOS "<<std::endl;
-			//! ERROR: !Hace que el puntero apunte a la misma tabla en ambas variables
 			*_tablero_dinamico = *_tablero_estatico; //! MOVE SEMANTICS
 			_tablero_estatico->imprime_tabla();//para debug en consola
 			pieza_bloqueada = true;
@@ -309,7 +294,7 @@ void Game::bajar_pieza_si_puede(Pieza* p_pieza){
 
 void Game::Dibuja_tablero(){
 
-	SDL_Rect cuadrado = { REJILLA, REJILLA, ANCHO_TABLERO* REJILLA , ALTO_TABLERO* REJILLA};
+	SDL_Rect cuadrado = { REJILLA, REJILLA, COLUMNAS* REJILLA , FILAS* REJILLA};
 	SDL_SetRenderDrawColor( _Render.get(), 0x00, 0x00, 0x00, 0x00 );   //Borde tablero en negro    
 	SDL_RenderDrawRect( _Render.get(), &cuadrado );
 }
@@ -317,15 +302,12 @@ void Game::Dibuja_tablero(){
 
 const int * Game::get_puntuacion(){
 	
-	const int * temp = &_puntuacion;
-	return temp;
+	return &(_params->puntuacion_previa);
 }
 
 const int * Game::get_nivel(){
 	
-	//const int  * temp = &_nivel;
-	//return temp;
-	return _nivel;
+	return &((_params.get())->nivel);
 }
 
 Uint32 interrupcion(Uint32 interval, void *param)
@@ -339,3 +321,33 @@ Uint32 interrupcion(Uint32 interval, void *param)
 
 	return (Uint32)niveles[((Interrupt_Param*)param)->nivel];
 }  //devuelve la velocidad para la siguiente ejecución
+
+std::unique_ptr<Texto> Game::get_nombre_jugador(){
+
+	return std::move(_Nombre_Jugador);
+}
+
+std::unique_ptr<Texto> Game::get_Texto_Puntuacion(){
+	
+	return std::move(_Texto_Puntuacion);
+}
+
+std::unique_ptr<Texto> Game::get_Texto_Nivel(){
+	
+	return std::move(_Texto_Nivel);
+}
+
+std::unique_ptr<Texto> Game::get_Valor_Nivel(){
+	
+	return std::move(_Valor_Nivel);
+}
+
+std::unique_ptr<Texto> Game::get_Texto_Jugador(){
+	
+	return std::move(_Texto_Jugador);
+}
+
+std::unique_ptr<Texto> Game::get_Valor_Puntuacion(){
+	
+	return std::move(_Valor_Puntuacion);
+}

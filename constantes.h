@@ -7,8 +7,6 @@ const int REJILLA = 20; //píxeles
 //dimensiones del tablero 
 const int COLUMNAS = 8;
 const int FILAS = 12;
-const int ANCHO_TABLERO = COLUMNAS;
-const int ALTO_TABLERO = FILAS;
 
 //Dimensiones de la ventana. Se adaptan a las del tablero
 const int ANCHO = (COLUMNAS + 12) * REJILLA;
