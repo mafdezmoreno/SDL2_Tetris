@@ -1,10 +1,14 @@
 #include "constantes.h"
 #include <iostream>
 #include "texto.h"
+#include <memory>
+#include <thread>
+#include <mutex>
+
 
 
 //!Default Constructor
-Texto::Texto(SDL_Renderer* ext_render)
+Texto::Texto(std::shared_ptr<SDL_Renderer> ext_render)
 {
 	_Render = ext_render;
 	_Textura = nullptr;
@@ -14,45 +18,75 @@ Texto::Texto(SDL_Renderer* ext_render)
 
 }
 
-
 //! Constructor
-Texto::Texto(std::string texto_renderizar, SDL_Renderer* ext_render)
-//Texto::Texto(const char * texto_renderizar, SDL_Renderer* ext_render){
+Texto::Texto(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render)
 {
-
+	static std::mutex mi_mutex;
+    std::lock_guard<std::mutex> mi_guard(mi_mutex);
 	_Render = ext_render;
 	_Textura = nullptr;
 	_ancho = 0;
 	_alto = 0;
+
 	cargar_texto(texto_renderizar);
 	std::cout << "Texto Constructor " << this << ": ";
-	std::cout << texto_renderizar <<std::endl;
+	std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 
 }
 
-void Texto::cargar_texto(std::string inputText)
-//void Texto::cargar_texto(char inputText)
+
+bool Texto::cargar_texto(std::string inputText)
 {
+	
+	static std::unique_ptr<TTF_Font,decltype(&TTF_CloseFont)> Fuente_TTF(TTF_OpenFont("FreeSansBold.ttf", 18), TTF_CloseFont);
+	//if (Fuente_TTF){
+	//	std::cout<<"Direccion Fuente_TTF: "<< Fuente_TTF.get()<<std::endl;
+	//}
 	if( Fuente_TTF == NULL ){
 		std::cout<< "Error en la carga de la fuente. SDL_ttf Error: " << TTF_GetError()  <<std::endl;
+		return false;
 	}
-	else{
-		if(!cargar_texto_renderizado(inputText)){
-			std::cout<< "No se ha podido renderizar la textura del texto: "<< "<<"<< inputText << ">>" <<std::endl;
-		}
+
+	_cadena_texto = inputText;//! usar set cadena de texto
+
+	//! pasar a smart pointer
+	SDL_Surface* Texto_Surface = TTF_RenderText_Blended(Fuente_TTF.get(), inputText.c_str(), {0,0,0});
+	if( Texto_Surface == nullptr )
+	{
+		std::cout<< "TTF_RenderText_Blended Error: " << TTF_GetError() << std::endl;
+		return false;
 	}
+
+	_Textura = SDL_CreateTextureFromSurface( _Render.get(), Texto_Surface );
+	if( _Textura == nullptr )
+	{
+		std::cout<< "SDL_CreateTextureFromSurface Error: " <<  SDL_GetError() << std::endl;
+		return false;
+	}
+
+	_ancho = Texto_Surface->w;
+	_alto = Texto_Surface->h;
+
+
+	SDL_FreeSurface(Texto_Surface);
+
+	std::cout<< "Cadena de texto a RENDERIZADO: " << _cadena_texto <<std::endl;
+	
+	return true;
 }
+
 
 // Rule of five implementation: https://cpppatterns.com/patterns/rule-of-five.html#line7
 //! Copy Costructor
 Texto::Texto(const Texto& original){
 	
+	_Render = original._Render;
 	_Textura = original._Textura;
 	_cadena_texto = original._cadena_texto;
 	_ancho = original._ancho;
 	_alto = original._alto;
-	std::cout << "Texto Copy Costructor " << this << ": ";
-	std::cout << _cadena_texto <<std::endl;
+	//std::cout << "Texto Copy Costructor " << this << ": ";
+	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 }
 
 //! Copy assignment operator
@@ -61,12 +95,14 @@ Texto& Texto::operator=(const Texto& original){
 	if (this == &original)  // prevención auto asignación
     	return *this;
 
+	_Render = original._Render;
+	_Textura = original._Textura;
 	_cadena_texto = original._cadena_texto;
 	_ancho = original._ancho;
 	_alto = original._alto;
 
-	std::cout << "Texto Copy assignment operator " << this << ": ";
-	std::cout << _cadena_texto <<std::endl;
+	//std::cout << "Texto Copy assignment operator " << this << ": ";
+	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 
 	return *this;
 }
@@ -74,14 +110,15 @@ Texto& Texto::operator=(const Texto& original){
 //! Move constructor
 Texto::Texto(Texto&& original)  noexcept{
 	
-	_cadena_texto = original._cadena_texto;
-	_ancho = original._ancho;
-	_alto = original._alto;
-
-	original._cadena_texto = nullptr;
-
-	std::cout << "Texto Move constructor " << this << ": ";
-	std::cout << _cadena_texto <<std::endl;
+	_Render = std::move(original._Render);
+	_Textura = std::move(original._Textura);
+	_cadena_texto = std::move(original._cadena_texto);
+	_ancho = std::move(original._ancho);
+	_alto = std::move(original._alto);
+	original._Textura = nullptr;
+	original._Render = nullptr;
+	//std::cout << "Texto Move constructor " << this << ": ";
+	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 }
 
 //! Move assignment operator
@@ -89,19 +126,18 @@ Texto& Texto::operator=(Texto&& original) noexcept{
 	
 	if (this == &original)  // prevención auto asignación
     	return *this;
-	
-	//if(!_cadena_texto)
-	//	delete _cadena_texto;
 
+	_Render = original._Render;
+	_Textura = original._Textura;
 	_cadena_texto = original._cadena_texto;
 	_ancho = original._ancho;
 	_alto = original._alto;
 
-	original._cadena_texto = nullptr;
+	original._Textura = nullptr;
+	original._Render = nullptr;
 
-
-	std::cout << "Texto Move assignment operator " << this << ": ";
-	std::cout << _cadena_texto <<std::endl;
+	//std::cout << "Texto Move assignment operator " << this << ": ";
+	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 
 	return *this;
 }
@@ -112,13 +148,12 @@ Texto::~Texto()
 	std::cout << "DESTRUCTOR TEXTO " << this << std::endl;
 }
 
-
+/*
 bool Texto::cargar_texto_renderizado(std::string texto_renderizar)
 {
-
 	_cadena_texto = texto_renderizar;
 	std::cout<< "Cadena de texto a renderizar: " << _cadena_texto<<std::endl;
-	SDL_Surface* Texto_Surface = TTF_RenderText_Blended( Fuente_TTF, texto_renderizar.c_str(),  {0,0,0});
+	SDL_Surface* Texto_Surface = TTF_RenderText_Blended(Fuente_TTF.get(), texto_renderizar.c_str(), {0,0,0});
 	
 	if( Texto_Surface == nullptr )
 	{
@@ -126,7 +161,7 @@ bool Texto::cargar_texto_renderizado(std::string texto_renderizar)
 	}
 	else
 	{
-        _Textura = SDL_CreateTextureFromSurface( _Render, Texto_Surface );
+        _Textura = SDL_CreateTextureFromSurface( _Render.get(), Texto_Surface );
 		if( _Textura == nullptr )
 		{
 			std::cout<< "SDL_CreateTextureFromSurface Error: " <<  SDL_GetError() << std::endl;
@@ -139,9 +174,9 @@ bool Texto::cargar_texto_renderizado(std::string texto_renderizar)
 
 		SDL_FreeSurface( Texto_Surface );
 	}
-	
+	std::cout<< "Cadena de texto a RENDERIZADO: " << _cadena_texto<<std::endl;
 	return _Textura != nullptr;
-}
+}*/
 
 int Texto::get_ancho()
 {

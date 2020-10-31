@@ -12,6 +12,7 @@ const int FILAS = 12;
 const int ANCHO = (COLUMNAS + 12) * REJILLA;
 const int ALTO = (FILAS + 2) * REJILLA;
 
+
 //Códigos de colores para piezas y renderizados
 const int colores[16][3]     = {{0,0,0},            //0 black 
                                 {255,255,255},      //1 white

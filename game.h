@@ -38,7 +38,7 @@ class Game{
 
     public:
 
-        Game(Game_Init * game_start);//, Interrupt_Param * param);
+        Game(Game_Init& game_start);//, Interrupt_Param * param);
         ~Game();
         
         void Mueve_Pieza_Si_Se_Puede(const SDL_Keycode& tecla, Pieza &pieza, Tablero &tablero);
@@ -50,8 +50,8 @@ class Game{
         bool cargar_texto();
         void game_run();
 
-        const int * get_puntuacion();
-        const int * get_nivel();
+        std::unique_ptr<const int> get_puntuacion();
+        std::unique_ptr<const int>  get_nivel();
 
         std::unique_ptr<Texto> get_nombre_jugador();
         std::unique_ptr<Texto> get_Texto_Puntuacion();
@@ -62,7 +62,10 @@ class Game{
     
         // https://stackoverflow.com/questions/48672399/is-it-possible-to-use-sdl2-with-smart-pointers
         std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> _Ventana;
-        std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> _Render;
+        //std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> _Render;
+        
+        std::shared_ptr<SDL_Renderer> _Render;
+
     
     private:
 
@@ -78,6 +81,7 @@ class Game{
         static constexpr std::size_t _kMsPerFrame{1000 / _kFramesPerSecond};
 
         std::shared_ptr<Interrupt_Param> _params;
+
         std::unique_ptr<Texto> _Nombre_Jugador;
         std::unique_ptr<Texto> _Texto_Puntuacion;
         std::unique_ptr<Texto> _Texto_Nivel;

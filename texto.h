@@ -4,8 +4,10 @@
 #include <SDL.h>
 #include <SDL_ttf.h> //! Necesaria
 #include <string>
-
-extern SDL_Renderer* Render;  //! Destruir en la proxima clase Game a crear
+#include "memory"
+#include <future>
+#include <thread>
+#include <utility>
 
 
 
@@ -14,27 +16,24 @@ class Texto
 {
 	public:
 		
-		
-		bool cargar_texto_renderizado(std::string texto_renderizar);
+		//bool cargar_texto_renderizado(std::string texto_renderizar);
 		
 		//https://stackoverflow.com/questions/495021/why-can-templates-only-be-implemented-in-the-header-file
 		template <class T> void renderizar(const T &x, const T &y)
 		{
 			SDL_Rect Cuadrado = { (int)x, (int)y, _ancho, _alto };
-			SDL_RenderCopyEx( _Render, _Textura, nullptr, &Cuadrado, 0, nullptr, SDL_FLIP_NONE );
+			SDL_RenderCopyEx( _Render.get(), _Textura, nullptr, &Cuadrado, 0, nullptr, SDL_FLIP_NONE );
 		}
 
 		int get_ancho();
 		std::string get_cadena_texto();
 		void set_cadena_texto(std::string texto);
-		void cargar_texto(std::string inputText);
+		bool cargar_texto(std::string inputText);
 
-	// Rule of five implementation: https://cpppatterns.com/patterns/rule-of-five.html#line7
-		
 		//! Default Constructor
-		Texto(SDL_Renderer* ext_render);
+		Texto(std::shared_ptr<SDL_Renderer> ext_render);
 		//! Constructor
-		Texto(std::string texto_renderizar, SDL_Renderer* ext_render);
+		Texto(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render);
 		//Copy Costructor
 	    Texto(const Texto& original);
 		//Copy assignment operator
@@ -45,19 +44,17 @@ class Texto
 		Texto(Texto&& original)  noexcept;
 		//Move assignment operator
 		Texto& operator=(Texto&& original) noexcept;
-
-
+		
 	private:
-		SDL_Renderer* _Render = NULL;
-		TTF_Font * Fuente_TTF = TTF_OpenFont("FreeSansBold.ttf", 16);
-		void liberar();	//libera los recursos reservados
+		std::shared_ptr<SDL_Renderer> _Render;
 		std::string _cadena_texto;
+
+		//!convertir en smart pointer
 		SDL_Texture* _Textura;
 		int _ancho{0};
 		int _alto{0};
-		
+	
 };
-
 
 #endif
 

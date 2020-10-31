@@ -16,23 +16,27 @@
 // Ordenar el hitorico de puntuaciones. Quedarme con las 5 más altas, mostrarlas por pantalla y si se superan estas puntuaciones, almacenar la nueva puntuacion
 
 //! Object Oriented Programming:
-	//! hacer algún overload de alguna función (quizás los mas fácil sea hacerlo de un constructor)
 	//! Derived class functions override virtual base class functions: One member function in an inherited class overrides a virtual base class member function.
 
 //!Concurrency
-	//! A promise and future is used in the project. A promise and future is used to pass data from a worker thread to a parent thread in the project code.
-	//! A mutex or lock is used in the project. A mutex or lock (e.g. std::lock_guard or `std::unique_lock) is used to protect data that is shared across multiple threads in the project code.
+
+	//- [] The project uses multithreading. The project uses multiple threads in the execution.
+	//- [] A condition variable is used in the project. A ```std::condition_variable``` is used in the project code to synchronize thread execution.
 
 int main( int argc, char* args[] )
 {
 
 	Game_Init game_init; //crea ventana, render y pide nombre
-	Game game(&game_init);
+	
+	Game game(game_init);
+	
 	game.game_run();
-	Game_Close game_close(&game, &game_init); //debe adquirir ventana, render, nivel, puntuacion
+	
+	Game_Close game_close(game, game_init); //debe adquirir ventana, render, nivel, puntuacion
 	
 	return 0;
 }
+
 
 
 

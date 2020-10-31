@@ -6,38 +6,32 @@
 #include <fstream>
 #include <sstream>
 
-Game_Close::Game_Close(Game * game, Game_Init * game_init)
+Game_Close::Game_Close(Game& game, Game_Init& game_init)
 	: _Ventana(nullptr, SDL_DestroyWindow) ,
 	  _Render (nullptr, SDL_DestroyRenderer){
 
 	std::cout<<"Game_Close Construido "<<this<< std::endl;
 	
-	_Texto_Jugador = game->get_Texto_Jugador();
-    _Nombre_Jugador = game->get_nombre_jugador();
-    _Texto_Puntuacion = game->get_Texto_Puntuacion();
-    _Valor_Puntuacion = game->get_Valor_Puntuacion();
-    _Texto_Nivel = game ->get_Texto_Nivel();
-    _Valor_Nivel = game ->get_Valor_Nivel();
+	//move all the rendered text
+	_Texto_Jugador = game.get_Texto_Jugador();
+    _Nombre_Jugador = game.get_nombre_jugador();
+    _Texto_Puntuacion = game.get_Texto_Puntuacion();
+    _Valor_Puntuacion = game.get_Valor_Puntuacion();
+    _Texto_Nivel = game.get_Texto_Nivel();
+    _Valor_Nivel = game.get_Valor_Nivel();
+	_pulsa_intro_continuar = game_init.get_pulsa_intro_continuar();
 	
-	_pulsa_intro_continuar = game_init -> get_pulsa_intro_continuar();
+	//move window and render
+	_Ventana = std::move(game._Ventana);     // Ventana
+	_Render = std::move(game._Render);      // Elementos a renderizar en interior
 	
-	_Ventana = std::move(game->_Ventana);     // Ventana
-	_Render = std::move(game ->_Render);      // Elementos a renderizar en interior
-	
-	_puntuacion = game->get_puntuacion();
-
-	_nivel = game->get_nivel();
-
+	//get info to write into .txt
+	_puntuacion = game.get_puntuacion();
+	_nivel = game.get_nivel();
 	_nombre = _Nombre_Jugador->get_cadena_texto();
-	std::cout<<"A "<<this<< std::endl;
 
 	mostrar_puntuacion();
-	
-	std::cout<<"B "<<this<< std::endl;
-
 	registar_puntuacion();
-	std::cout<<"C "<<this<< std::endl;
-
 }
 
 

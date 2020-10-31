@@ -1,19 +1,56 @@
 #include "game_init.h"
 #include "constantes.h"
 #include <iostream>
+#include <future>
+#include <thread>
+#include <utility>
+#include <chrono>
+
+void pruebas(std::promise<Texto*>&& Promesa, std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render){
+
+	Promesa.set_value(new Texto(texto_renderizar, ext_render));
+}
 
 Game_Init::Game_Init()
-	: _Ventana(nullptr, SDL_DestroyWindow) ,
-	  _Render (nullptr, SDL_DestroyRenderer) { //Constructor
-
+	: _Ventana(nullptr, SDL_DestroyWindow),
+	  _Render (nullptr, SDL_DestroyRenderer)
+{//Constructor
+	std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
+    std::chrono::duration<float> duration;
+    start = std::chrono::high_resolution_clock::now();
 	std::cout<<"\nGame Init Constructor" << this <<std::endl; 
     if(inicializar()){
-		_pedir_nombre_jugador = std::make_unique<Texto> ("Introduce tu nombre:", _Render.get());
-		_Nombre_Jugador_Temp = std::make_unique<Texto>("Jugador 1", _Render.get());
-		_pulsa_intro_continuar = std::make_unique<Texto> ("Pulsa Enter para continuar",_Render.get());
+	
+		// In this case, it is not more efficient to use future and promise, but I did it to to fulfill the requirements of the capstone
+		///* //future and promise: https://www.modernescpp.com/index.php/promise-and-future
+		std::promise<Texto*> p_1, p_2, p_3;
+		std::future<Texto*>  f_1 = p_1.get_future();
+		std::future<Texto*>  f_2 = p_2.get_future();
+		std::future<Texto*>  f_3 = p_3.get_future();
+		
+		std::thread mi_hilo_1(pruebas, std::move(p_1),"Introduce tu nombre:", _Render);
+		std::thread mi_hilo_2(pruebas, std::move(p_2),"Pulsa Enter para continuar", _Render);
+		std::thread mi_hilo_3(pruebas, std::move(p_3),"Jugador 1", _Render);
+		
+		_pedir_nombre_jugador = std::make_unique<Texto>(std::move(*(f_1.get())));
+		_pulsa_intro_continuar = std::make_unique<Texto>(std::move(*(f_2.get())));
+		_Nombre_Jugador_Temp = std::make_unique<Texto>(std::move(*(f_3.get())));
+		mi_hilo_1.join(); mi_hilo_2.join(); mi_hilo_3.join();
+		//*/
+		
+		/*
+		_pulsa_intro_continuar = std::make_unique<Texto> ("Pulsa Enter para continuar",_Render);
+		_pedir_nombre_jugador = std::make_unique<Texto>("Introduce tu nombre:",_Render);
+		_Nombre_Jugador_Temp = std::make_unique<Texto>("Jugador 1", _Render);
+		*/
+		end = std::chrono::high_resolution_clock::now();
+		duration = end-start;
+		std::cout<<"\nTIEMPO QUE HA TARDADO LA CONSTRUCCION: "<< duration.count() <<" \n"<<std::endl;
 		pantalla_pedir_nombre();
 	}
+	std::cout<< "_Render.use_count() = "<<_Render.use_count() << std::endl;
 }
+
 
 
 Game_Init::~Game_Init(){
@@ -26,12 +63,10 @@ std::unique_ptr<Texto> Game_Init::get_nombre_jugador(){
 	return std::move(_Nombre_Jugador_Temp);
 }
 
-
 std::unique_ptr<Texto> Game_Init::get_pulsa_intro_continuar(){
 	
 	return std::move(_pulsa_intro_continuar);
 }
-
 
 void Game_Init::pantalla_pedir_nombre(){
 
@@ -83,11 +118,11 @@ void Game_Init::pantalla_pedir_nombre(){
 		{
 			if( inputText != "" )
 			{
-						_Nombre_Jugador_Temp->cargar_texto_renderizado( inputText.c_str());
+						_Nombre_Jugador_Temp->cargar_texto( inputText.c_str());
 			}
 			else
 			{
-						_Nombre_Jugador_Temp->cargar_texto_renderizado( " ");
+						_Nombre_Jugador_Temp->cargar_texto( " ");
 			}
 		}
 
@@ -96,9 +131,10 @@ void Game_Init::pantalla_pedir_nombre(){
 		SDL_RenderClear( _Render.get() );
 
 		//Render text textures
-		_pedir_nombre_jugador->renderizar( (ANCHO - _pedir_nombre_jugador->get_ancho())/2, REJILLA );
-		_Nombre_Jugador_Temp->renderizar ( (ANCHO - _Nombre_Jugador_Temp->get_ancho())/2 , 3*REJILLA );
-		_pulsa_intro_continuar->renderizar ( (ANCHO - _pulsa_intro_continuar->get_ancho())/2 , 5*REJILLA );
+		//!implementar multi-hilo
+		_pedir_nombre_jugador->renderizar ( (ANCHO - _pedir_nombre_jugador->get_ancho())/2, REJILLA );
+		_Nombre_Jugador_Temp->renderizar  ( (ANCHO - _Nombre_Jugador_Temp->get_ancho())/2 , 3*REJILLA );
+		_pulsa_intro_continuar->renderizar( (ANCHO - _pulsa_intro_continuar->get_ancho())/2 , 5*REJILLA );
 
 		//Update screen
 		SDL_RenderPresent( _Render.get() );
@@ -119,7 +155,7 @@ void Game_Init::pantalla_pedir_nombre(){
 	if( inputText != "" )
 	{
 		//Render new text
-		_Nombre_Jugador_Temp->cargar_texto_renderizado(inputText);
+		_Nombre_Jugador_Temp->cargar_texto(inputText);
 		//_Nombre_Jugador_Temp->set_cadena_texto(&inputText);
 	}
 	//Text is empty
@@ -127,7 +163,7 @@ void Game_Init::pantalla_pedir_nombre(){
 	{
 		//Render space texture
 		inputText = "Jugador 1";
-		_Nombre_Jugador_Temp->cargar_texto_renderizado(inputText);
+		_Nombre_Jugador_Temp->cargar_texto(inputText);
 		//_Nombre_Jugador_Temp->set_cadena_texto(&inputText);
 	}	
 
@@ -159,7 +195,9 @@ bool Game_Init::inicializar()
 		}
 		else
 		{
-			_Render.reset(SDL_CreateRenderer( _Ventana.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC ));
+			//shared pointer. Incluye el tipo de deleter															//deleter
+			_Render.reset(SDL_CreateRenderer( _Ventana.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC ), SDL_DestroyRenderer);
+			
 			if( _Render == NULL )
 			{
 				std::cout<< "SDL_CreateRenderer Error: " << SDL_GetError() <<std::endl;

@@ -38,10 +38,8 @@ Tablero::Tablero(Tablero&& original) noexcept //! Move constructor
 Tablero& Tablero::operator=(Tablero& original){ //! Copy Assignment operator
 
     if (this == &original) return *this; //protección autocopia
-
     //Deep copy
     copiar_tableros(_tablero, original._tablero);
-  
     return *this;
 }
 
