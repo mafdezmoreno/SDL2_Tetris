@@ -5,7 +5,9 @@
 #include <thread>
 #include <mutex>
 
-
+//! Crear un constructor vacío, para poder llamar a con std::thread a una función init de la clase que se encarge de la inicialización de las variables en paralelo:
+// init(std::shared_ptr<SDL_Renderer> ext_render)
+// init_full(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render,) // con llamada a la función cargar texto
 
 //!Default Constructor
 Texto::Texto(std::shared_ptr<SDL_Renderer> ext_render)
@@ -37,6 +39,9 @@ Texto::Texto(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_ren
 
 bool Texto::cargar_texto(std::string inputText)
 {
+
+	static std::mutex mi_mutex;
+    std::lock_guard<std::mutex> mi_guard(mi_mutex);
 	
 	static std::unique_ptr<TTF_Font,decltype(&TTF_CloseFont)> Fuente_TTF(TTF_OpenFont("FreeSansBold.ttf", 18), TTF_CloseFont);
 	//if (Fuente_TTF){

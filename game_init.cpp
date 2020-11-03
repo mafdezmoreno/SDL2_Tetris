@@ -4,7 +4,6 @@
 #include <future>
 #include <thread>
 #include <utility>
-#include <chrono>
 
 void pruebas(std::promise<Texto*>&& Promesa, std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render){
 
@@ -15,10 +14,7 @@ Game_Init::Game_Init()
 	: _Ventana(nullptr, SDL_DestroyWindow),
 	  _Render (nullptr, SDL_DestroyRenderer)
 {//Constructor
-	std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
-    std::chrono::duration<float> duration;
-    start = std::chrono::high_resolution_clock::now();
-	std::cout<<"\nGame Init Constructor" << this <<std::endl; 
+
     if(inicializar()){
 	
 		// In this case, it is not more efficient to use future and promise, but I did it to to fulfill the requirements of the capstone
@@ -43,12 +39,10 @@ Game_Init::Game_Init()
 		_pedir_nombre_jugador = std::make_unique<Texto>("Introduce tu nombre:",_Render);
 		_Nombre_Jugador_Temp = std::make_unique<Texto>("Jugador 1", _Render);
 		*/
-		end = std::chrono::high_resolution_clock::now();
-		duration = end-start;
-		std::cout<<"\nTIEMPO QUE HA TARDADO LA CONSTRUCCION: "<< duration.count() <<" \n"<<std::endl;
+
 		pantalla_pedir_nombre();
 	}
-	std::cout<< "_Render.use_count() = "<<_Render.use_count() << std::endl;
+	//std::cout<< "_Render.use_count() = "<<_Render.use_count() << std::endl;
 }
 
 

@@ -5,6 +5,11 @@
 #include <SDL_thread.h>
 #include <sstream>
 #include <string>
+#include <iostream>
+#include <future>
+#include <thread>
+#include <utility>
+#include <chrono>
 
 //! Constructor
 //Game::Game(Game_Init * game_start, bool * param)
@@ -16,25 +21,41 @@ Game::Game(Game_Init& game_start)//, Interrupt_Param * param)
 		_Ventana = std::move(game_start._Ventana);     // Ventana
         _Render = std::move(game_start._Render); // Elementos a renderizar en interior
 
-		//! crear con varios theads en paralelo, como hacen aquí:
-		//! implemenantar multithreading
-		//https://en.cppreference.com/w/cpp/memory/shared_ptr
-		_Texto_Puntuacion = std::make_unique<Texto>("Puntuacion: ", _Render);
+		//std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
+    	//std::chrono::duration<float> duration;
+    	//start = std::chrono::high_resolution_clock::now();
+
+		//The following lines takes ~0.14 - 0.07 s 
+		//_Texto_Puntuacion = std::make_unique<Texto>("Puntuacion: ", _Render);
+		//_Texto_Nivel = std::make_unique<Texto>("Nivel: ", _Render);
+		//_Texto_Jugador = std::make_unique<Texto>("Jugador: ", _Render);		
+		
+		//The same code, with this three treads reduces until ~0.05s or less 
+		_Texto_Puntuacion = std::make_unique<Texto>(_Render);
+		std::thread t1(&Texto::cargar_texto, _Texto_Puntuacion.get(), "Puntuacion: ");
+		_Texto_Nivel = std::make_unique<Texto>( _Render);
+		std::thread t2(&Texto::cargar_texto, _Texto_Nivel.get(), "Nivel: ");
+		_Texto_Jugador = std::make_unique<Texto>(_Render);
+		std::thread t3(&Texto::cargar_texto, _Texto_Jugador.get(), "Jugador: ");
+
 		_Valor_Puntuacion = std::make_unique<Texto>( _Render);
-		_Texto_Nivel = std::make_unique<Texto>("Nivel: ", _Render);
 		_Valor_Nivel = std::make_unique<Texto>( _Render);
-		_Texto_Jugador = std::make_unique<Texto>("Jugador: ", _Render);
 		_Nombre_Jugador = game_start.get_nombre_jugador();
 		
-		_params = std::make_shared<Interrupt_Param>();
+		//end = std::chrono::high_resolution_clock::now();
+		//duration = end-start;
+		//std::cout<<"\nTIEMPO QUE HA TARDADO LA CONSTRUCCION: "<< duration.count() <<" \n"<<std::endl;
+		//system("pause");
 
+		_params = std::make_shared<Interrupt_Param>();
 		_tablero_dinamico = std::make_unique<Tablero>();
 		_tablero_estatico = std::make_unique<Tablero>(_params);
 
 		std::cout << "GAME CONSTRUCTOR " << this << ": "<<std::endl;
+		t1.join(); t2.join(); t3.join();
 	}
 	else
-		std::cout<<"ERROR CONSTRUCTOR GAME"<<std::endl;
+		std::cout<<"ERROR Init CONSTRUCTOR GAME"<<std::endl;
 	
 }
 
@@ -98,7 +119,7 @@ void Game::Mueve_Pieza_Si_Se_Puede(const SDL_Keycode& tecla, Pieza &pieza, Table
 
 void Game::Actualiza_Pantalla(Pieza &pieza, Pieza &siguiente_pieza){
 	
-	//// Comprobar si no es necesario renderizar constantemente zonas estáticas (texto, tablero, etc...). Se podría hacer sobre escribiendo con el color del fondo en las zonas a aztualziar
+	//// Comprobar si no es necesario renderizar constantemente zonas estáticas (texto, tablero, etc...). Se podría hacer sobre escribiendo con el color del fondo en las zonas a actualizar
 	SDL_SetRenderDrawColor( _Render.get(), 200, 200, 200, 0xFF ); //Colores de la pantalla
 	SDL_RenderClear( _Render.get() ); //Limpia la pantalla
 
