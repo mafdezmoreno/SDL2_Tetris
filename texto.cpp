@@ -37,16 +37,50 @@ Texto::Texto(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_ren
 }
 
 
+std::unique_ptr<TTF_Font, std::function<void(TTF_Font*)>> 
+assign_font(TTF_Font* Fuente_TTF) {
+  		
+	return std::unique_ptr<TTF_Font,std::function<void(TTF_Font*)>>(Fuente_TTF, [](TTF_Font* fnt) {
+   		if (fnt != nullptr) 
+			TTF_CloseFont(fnt); //Segmentation fault whit static variable
+	});
+}
+
+
 bool Texto::cargar_texto(std::string inputText)
 {
 
 	static std::mutex mi_mutex;
     std::lock_guard<std::mutex> mi_guard(mi_mutex);
+    static std::unique_ptr<TTF_Font, std::function<void(TTF_Font*)>> Fuente_TTF(TTF_OpenFont("FreeSansBold.ttf", 18), [](TTF_Font* puntero)
+	{
+		std::cout << "No need to call deleter in a static uniquer pointer (avoid semgentation fault).\n";
+	});
+
+
+
+	//! bug: Segmentation fault
+	//static std::unique_ptr<TTF_Font, decltype(&TTF_CloseFont)> Fuente_TTF(TTF_OpenFont("FreeSansBold.ttf", 18), &TTF_CloseFont);
+
 	
-	static std::unique_ptr<TTF_Font,decltype(&TTF_CloseFont)> Fuente_TTF(TTF_OpenFont("FreeSansBold.ttf", 18), TTF_CloseFont);
-	//if (Fuente_TTF){
-	//	std::cout<<"Direccion Fuente_TTF: "<< Fuente_TTF.get()<<std::endl;
-	//}
+	/*Works
+    static std::unique_ptr<TTF_Font, std::function<void(TTF_Font*)>> Fuente_TTF(TTF_OpenFont("FreeSansBold.ttf", 18), [](TTF_Font* puntero)
+        {
+            std::cout << "destroying from a custom deleter...\n";
+			//if (puntero != nullptr){
+			//	TTF_CloseFont(puntero);//! segmentation fault: no deleter required whit static
+			//}
+        });
+	*/
+
+	/*Works removing deleter
+	static std::unique_ptr<TTF_Font, std::function<void(TTF_Font*)>> Fuente_TTF;
+		if(Fuente_TTF ==nullptr){
+			std::cout<<"Test"<<std::endl;
+    		Fuente_TTF = assign_font(TTF_OpenFont("FreeSansBold.ttf", 18));
+		}
+	*/
+
 	if( Fuente_TTF == NULL ){
 		std::cout<< "Error en la carga de la fuente. SDL_ttf Error: " << TTF_GetError()  <<std::endl;
 		return false;
