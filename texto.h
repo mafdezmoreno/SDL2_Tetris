@@ -23,12 +23,16 @@ class Texto
 
 		int get_ancho();
 		std::string get_cadena_texto();
-		void set_cadena_texto(std::string texto);
 		bool cargar_texto(std::string inputText);
 
-		//! Default Constructor
+		void init_full(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render); // con llamada a la función cargar texto
+		void init(std::shared_ptr<SDL_Renderer> ext_render);
+		
+		// Default Constructor
+		Texto();
+		// Constructor II
 		Texto(std::shared_ptr<SDL_Renderer> ext_render);
-		//! Constructor
+		// Constructor III
 		Texto(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render);
 		//Copy Costructor
 	    Texto(const Texto& original);
@@ -42,6 +46,9 @@ class Texto
 		Texto& operator=(Texto&& original) noexcept;
 		
 	private:
+		void _set_cadena_texto(std::string texto);
+
+
 		std::shared_ptr<SDL_Renderer> _Render;
 		std::string _cadena_texto;
 		std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> _Textura;

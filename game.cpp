@@ -12,7 +12,6 @@
 #include <chrono>
 
 //! Constructor
-//Game::Game(Game_Init * game_start, bool * param)
 Game::Game(Game_Init& game_start)//, Interrupt_Param * param)
 	: _Ventana(nullptr, SDL_DestroyWindow), 
 	_Render (nullptr, SDL_DestroyRenderer){
@@ -20,6 +19,7 @@ Game::Game(Game_Init& game_start)//, Interrupt_Param * param)
 	if(_init_timer()){
 		_Ventana = std::move(game_start._Ventana);     // Ventana
         _Render = std::move(game_start._Render); // Elementos a renderizar en interior
+		_Nombre_Jugador = game_start.get_nombre_jugador();
 
 		//std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
     	//std::chrono::duration<float> duration;
@@ -31,28 +31,40 @@ Game::Game(Game_Init& game_start)//, Interrupt_Param * param)
 		//_Texto_Jugador = std::make_unique<Texto>("Jugador: ", _Render);		
 		
 		//The same code, with this three treads reduces until ~0.05s or less 
-		_Texto_Puntuacion = std::make_unique<Texto>(_Render);
-		std::thread t1(&Texto::cargar_texto, _Texto_Puntuacion.get(), "Puntuacion: ");
-		_Texto_Nivel = std::make_unique<Texto>( _Render);
-		std::thread t2(&Texto::cargar_texto, _Texto_Nivel.get(), "Nivel: ");
-		_Texto_Jugador = std::make_unique<Texto>(_Render);
-		std::thread t3(&Texto::cargar_texto, _Texto_Jugador.get(), "Jugador: ");
+		//_Texto_Puntuacion = std::make_unique<Texto>(_Render);
+		//std::thread t1(&Texto::cargar_texto, _Texto_Puntuacion.get(), "Puntuacion: ");
+		//_Texto_Nivel = std::make_unique<Texto>( _Render);
+		//std::thread t2(&Texto::cargar_texto, _Texto_Nivel.get(), "Nivel: ");
+		//_Texto_Jugador = std::make_unique<Texto>(_Render);
+		//std::thread t3(&Texto::cargar_texto, _Texto_Jugador.get(), "Jugador: ");
+		//_Valor_Puntuacion = std::make_unique<Texto>( _Render);
+		//_Valor_Nivel = std::make_unique<Texto>( _Render);
+	
+		//This version reduces until ~0.012s or less 
+		_Texto_Puntuacion = std::make_unique<Texto>();
+		std::thread t1(&Texto::init_full, _Texto_Puntuacion.get(), "Puntuacion: ", _Render);
+		_Texto_Nivel = std::make_unique<Texto>();
+		std::thread t2(&Texto::init_full, _Texto_Nivel.get(), "Nivel: ", _Render);
+		_Texto_Jugador = std::make_unique<Texto>();
+		std::thread t3(&Texto::init_full, _Texto_Jugador.get(), "Jugador: ", _Render);
+		_Valor_Puntuacion = std::make_unique<Texto>();
+		std::thread t4(&Texto::init, _Valor_Puntuacion.get(),  _Render);
+		_Valor_Nivel = std::make_unique<Texto>();
+		std::thread t5(&Texto::init, _Valor_Nivel.get(), _Render);
 
-		_Valor_Puntuacion = std::make_unique<Texto>( _Render);
-		_Valor_Nivel = std::make_unique<Texto>( _Render);
-		_Nombre_Jugador = game_start.get_nombre_jugador();
-		
 		//end = std::chrono::high_resolution_clock::now();
 		//duration = end-start;
-		//std::cout<<"\nTIEMPO QUE HA TARDADO LA CONSTRUCCION: "<< duration.count() <<" \n"<<std::endl;
-		//system("pause");
 
 		_params = std::make_shared<Interrupt_Param>();
 		_tablero_dinamico = std::make_unique<Tablero>();
 		_tablero_estatico = std::make_unique<Tablero>(_params);
 
+		t1.join(); t2.join(); t3.join(); t4.join(); t5.join();
+		
+		//std::cout<<"\nTIEMPO QUE HA TARDADO LA CONSTRUCCION: "<< duration.count() <<" \n"<<std::endl;
+		//system("pause");
 		std::cout << "GAME CONSTRUCTOR " << this << ": "<<std::endl;
-		t1.join(); t2.join(); t3.join();
+
 	}
 	else
 		std::cout<<"ERROR Init CONSTRUCTOR GAME"<<std::endl;
