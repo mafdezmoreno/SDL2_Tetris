@@ -22,7 +22,7 @@ class Texto
 		template <class T> void renderizar(const T &x, const T &y)
 		{
 			SDL_Rect Cuadrado = { (int)x, (int)y, _ancho, _alto };
-			SDL_RenderCopyEx( _Render.get(), _Textura, nullptr, &Cuadrado, 0, nullptr, SDL_FLIP_NONE );
+			SDL_RenderCopyEx( _Render.get(), _Textura.get(), nullptr, &Cuadrado, 0, nullptr, SDL_FLIP_NONE );
 		}
 
 		int get_ancho();
@@ -50,7 +50,9 @@ class Texto
 		std::string _cadena_texto;
 
 		//!convertir en smart pointer
-		SDL_Texture* _Textura;
+		//SDL_Texture* _Textura;
+		std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> _Textura;
+
 		int _ancho{0};
 		int _alto{0};
 	

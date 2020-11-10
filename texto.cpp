@@ -10,29 +10,30 @@
 // init_full(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render,) // con llamada a la función cargar texto
 
 //!Default Constructor
-Texto::Texto(std::shared_ptr<SDL_Renderer> ext_render)
+Texto::Texto(std::shared_ptr<SDL_Renderer> ext_render):
+_Textura (nullptr, SDL_DestroyTexture)
 {
 	_Render = ext_render;
-	_Textura = nullptr;
+	//_Textura = nullptr;
 	_ancho = 0;
 	_alto = 0;
 	std::cout << "Texto Default Constructor " << this << ": "<<std::endl;
-
 }
 
 //! Constructor
-Texto::Texto(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render)
+Texto::Texto(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render):
+_Textura (nullptr, SDL_DestroyTexture)
 {
 	static std::mutex mi_mutex;
     std::lock_guard<std::mutex> mi_guard(mi_mutex);
 	_Render = ext_render;
-	_Textura = nullptr;
+	//_Textura = nullptr;
 	_ancho = 0;
 	_alto = 0;
 
 	cargar_texto(texto_renderizar);
 	std::cout << "Texto Constructor " << this << ": ";
-	std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
+	std::cout << _cadena_texto <<" "<<_Textura.get() <<std::endl;
 
 }
 
@@ -90,13 +91,17 @@ bool Texto::cargar_texto(std::string inputText)
 
 	//! pasar a smart pointer
 	SDL_Surface* Texto_Surface = TTF_RenderText_Blended(Fuente_TTF.get(), inputText.c_str(), {0,0,0});
+	
+	
+	
 	if( Texto_Surface == nullptr )
 	{
 		std::cout<< "TTF_RenderText_Blended Error: " << TTF_GetError() << std::endl;
 		return false;
 	}
 
-	_Textura = SDL_CreateTextureFromSurface( _Render.get(), Texto_Surface );
+	//_Textura = SDL_CreateTextureFromSurface( _Render.get(), Texto_Surface );
+	_Textura.reset(SDL_CreateTextureFromSurface( _Render.get(), Texto_Surface ));
 	if( _Textura == nullptr )
 	{
 		std::cout<< "SDL_CreateTextureFromSurface Error: " <<  SDL_GetError() << std::endl;
@@ -117,13 +122,18 @@ bool Texto::cargar_texto(std::string inputText)
 
 // Rule of five implementation: https://cpppatterns.com/patterns/rule-of-five.html#line7
 //! Copy Costructor
-Texto::Texto(const Texto& original){
+Texto::Texto(const Texto& original):
+_Textura(nullptr, SDL_DestroyTexture)
+{
 	
 	_Render = original._Render;
-	_Textura = original._Textura;
+	//_Textura = original._Textura;
 	_cadena_texto = original._cadena_texto;
 	_ancho = original._ancho;
 	_alto = original._alto;
+
+	cargar_texto(_cadena_texto); //_Textura can't be copied, it's a smart pointer
+
 	//std::cout << "Texto Copy Costructor " << this << ": ";
 	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 }
@@ -135,11 +145,14 @@ Texto& Texto::operator=(const Texto& original){
     	return *this;
 
 	_Render = original._Render;
-	_Textura = original._Textura;
+	//_Textura = original._Textura;
+	
+
 	_cadena_texto = original._cadena_texto;
 	_ancho = original._ancho;
 	_alto = original._alto;
 
+	cargar_texto(_cadena_texto);
 	//std::cout << "Texto Copy assignment operator " << this << ": ";
 	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 
@@ -147,15 +160,17 @@ Texto& Texto::operator=(const Texto& original){
 }
 
 //! Move constructor
-Texto::Texto(Texto&& original)  noexcept{
+Texto::Texto(Texto&& original)  noexcept:
+_Textura(nullptr, SDL_DestroyTexture)
+{
 	
 	_Render = std::move(original._Render);
 	_Textura = std::move(original._Textura);
 	_cadena_texto = std::move(original._cadena_texto);
 	_ancho = std::move(original._ancho);
 	_alto = std::move(original._alto);
-	original._Textura = nullptr;
-	original._Render = nullptr;
+	//original._Textura = nullptr;
+	//original._Render = nullptr;
 	//std::cout << "Texto Move constructor " << this << ": ";
 	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 }
@@ -166,14 +181,14 @@ Texto& Texto::operator=(Texto&& original) noexcept{
 	if (this == &original)  // prevención auto asignación
     	return *this;
 
-	_Render = original._Render;
-	_Textura = original._Textura;
-	_cadena_texto = original._cadena_texto;
-	_ancho = original._ancho;
-	_alto = original._alto;
+	_Render = std::move(original._Render);
+	_Textura = std::move(original._Textura);
+	_cadena_texto = std::move(original._cadena_texto);
+	_ancho = std::move(original._ancho);
+	_alto = std::move(original._alto);
 
-	original._Textura = nullptr;
-	original._Render = nullptr;
+	//original._Textura = nullptr;
+	//original._Render = nullptr;
 
 	//std::cout << "Texto Move assignment operator " << this << ": ";
 	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
