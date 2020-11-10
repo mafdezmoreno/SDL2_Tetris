@@ -9,15 +9,11 @@
 #include <thread>
 #include <utility>
 
-
-
 //Clase para el renderizado del texto
 class Texto
 {
 	public:
-		
-		//bool cargar_texto_renderizado(std::string texto_renderizar);
-		
+				
 		//https://stackoverflow.com/questions/495021/why-can-templates-only-be-implemented-in-the-header-file
 		template <class T> void renderizar(const T &x, const T &y)
 		{
@@ -48,14 +44,10 @@ class Texto
 	private:
 		std::shared_ptr<SDL_Renderer> _Render;
 		std::string _cadena_texto;
-
-		//!convertir en smart pointer
-		//SDL_Texture* _Textura;
 		std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> _Textura;
 
 		int _ancho{0};
 		int _alto{0};
-	
 };
 
 #endif

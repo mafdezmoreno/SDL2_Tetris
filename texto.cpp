@@ -37,7 +37,7 @@ _Textura (nullptr, SDL_DestroyTexture)
 
 }
 
-
+/*
 std::unique_ptr<TTF_Font, std::function<void(TTF_Font*)>> 
 assign_font(TTF_Font* Fuente_TTF) {
   		
@@ -45,7 +45,7 @@ assign_font(TTF_Font* Fuente_TTF) {
    		if (fnt != nullptr) 
 			TTF_CloseFont(fnt); //Segmentation fault whit static variable
 	});
-}
+}*/
 
 
 bool Texto::cargar_texto(std::string inputText)
@@ -53,6 +53,7 @@ bool Texto::cargar_texto(std::string inputText)
 
 	static std::mutex mi_mutex;
     std::lock_guard<std::mutex> mi_guard(mi_mutex);
+
     static std::unique_ptr<TTF_Font, std::function<void(TTF_Font*)>> Fuente_TTF(TTF_OpenFont("FreeSansBold.ttf", 18), [](TTF_Font* puntero)
 	{
 		std::cout << "No need to call deleter in a static uniquer pointer (avoid semgentation fault).\n";
@@ -90,8 +91,13 @@ bool Texto::cargar_texto(std::string inputText)
 	_cadena_texto = inputText;//! usar set cadena de texto
 
 	//! pasar a smart pointer
-	SDL_Surface* Texto_Surface = TTF_RenderText_Blended(Fuente_TTF.get(), inputText.c_str(), {0,0,0});
+	//SDL_Surface* Texto_Surface = TTF_RenderText_Blended(Fuente_TTF.get(), inputText.c_str(), {0,0,0});
 	
+	std::unique_ptr<SDL_Surface, std::function<void(SDL_Surface*)>> 
+	Texto_Surface(TTF_RenderText_Blended(Fuente_TTF.get(), inputText.c_str(), {0,0,0}), [](SDL_Surface* puntero)
+	{
+		SDL_FreeSurface(puntero);
+	});
 	
 	
 	if( Texto_Surface == nullptr )
@@ -101,7 +107,7 @@ bool Texto::cargar_texto(std::string inputText)
 	}
 
 	//_Textura = SDL_CreateTextureFromSurface( _Render.get(), Texto_Surface );
-	_Textura.reset(SDL_CreateTextureFromSurface( _Render.get(), Texto_Surface ));
+	_Textura.reset(SDL_CreateTextureFromSurface( _Render.get(), Texto_Surface.get()));
 	if( _Textura == nullptr )
 	{
 		std::cout<< "SDL_CreateTextureFromSurface Error: " <<  SDL_GetError() << std::endl;
@@ -112,7 +118,7 @@ bool Texto::cargar_texto(std::string inputText)
 	_alto = Texto_Surface->h;
 
 
-	SDL_FreeSurface(Texto_Surface);
+	//SDL_FreeSurface(Texto_Surface);
 
 	std::cout<< "Cadena de texto a RENDERIZADO: " << _cadena_texto <<std::endl;
 	
@@ -132,7 +138,7 @@ _Textura(nullptr, SDL_DestroyTexture)
 	_ancho = original._ancho;
 	_alto = original._alto;
 
-	cargar_texto(_cadena_texto); //_Textura can't be copied, it's a smart pointer
+	cargar_texto(_cadena_texto); //_Textura can't be copied, it's a unique pointer
 
 	//std::cout << "Texto Copy Costructor " << this << ": ";
 	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
@@ -146,8 +152,6 @@ Texto& Texto::operator=(const Texto& original){
 
 	_Render = original._Render;
 	//_Textura = original._Textura;
-	
-
 	_cadena_texto = original._cadena_texto;
 	_ancho = original._ancho;
 	_alto = original._alto;
@@ -201,36 +205,6 @@ Texto::~Texto()
 {
 	std::cout << "DESTRUCTOR TEXTO " << this << std::endl;
 }
-
-/*
-bool Texto::cargar_texto_renderizado(std::string texto_renderizar)
-{
-	_cadena_texto = texto_renderizar;
-	std::cout<< "Cadena de texto a renderizar: " << _cadena_texto<<std::endl;
-	SDL_Surface* Texto_Surface = TTF_RenderText_Blended(Fuente_TTF.get(), texto_renderizar.c_str(), {0,0,0});
-	
-	if( Texto_Surface == nullptr )
-	{
-		std::cout<< "TTF_RenderText_Blended Error: " << TTF_GetError() << std::endl;
-	}
-	else
-	{
-        _Textura = SDL_CreateTextureFromSurface( _Render.get(), Texto_Surface );
-		if( _Textura == nullptr )
-		{
-			std::cout<< "SDL_CreateTextureFromSurface Error: " <<  SDL_GetError() << std::endl;
-		}
-		else
-		{
-			_ancho = Texto_Surface->w;
-			_alto = Texto_Surface->h;
-		}
-
-		SDL_FreeSurface( Texto_Surface );
-	}
-	std::cout<< "Cadena de texto a RENDERIZADO: " << _cadena_texto<<std::endl;
-	return _Textura != nullptr;
-}*/
 
 int Texto::get_ancho()
 {
