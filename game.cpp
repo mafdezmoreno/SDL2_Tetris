@@ -2,7 +2,7 @@
 #include "texto.h"
 #include "tablero.h"
 #include <SDL.h>
-#include <SDL_thread.h>
+//#include <SDL_thread.h>
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -131,7 +131,6 @@ void Game::Mueve_Pieza_Si_Se_Puede(const SDL_Keycode& tecla, Pieza &pieza, Table
 
 void Game::Actualiza_Pantalla(Pieza &pieza, Pieza &siguiente_pieza){
 	
-	//// Comprobar si no es necesario renderizar constantemente zonas estáticas (texto, tablero, etc...). Se podría hacer sobre escribiendo con el color del fondo en las zonas a actualizar
 	SDL_SetRenderDrawColor( _Render.get(), 200, 200, 200, 0xFF ); //Colores de la pantalla
 	SDL_RenderClear( _Render.get() ); //Limpia la pantalla
 
@@ -230,23 +229,19 @@ Coordenada Game::Mapeado_Coord_Tablero(Coordenada &coord){
 
 void Game::game_run(){
 
-	//timer start
-	SDL_TimerID timerID = SDL_AddTimer(500, interrupcion, (void *)(_params.get()));
-
-	//Pasar a smart pointers
-	Pieza * pieza;
-	Pieza * siguiente_pieza;				  
+	std::unique_ptr<Pieza> pieza(new Pieza); 
+	std::unique_ptr<Pieza> siguiente_pieza;				  
 	Uint32 target_frame_duration = _kMsPerFrame;
 				
 	SDL_Event eventos;   // Gestor (cola) de eventos
 	SDL_RendererFlip flipType = SDL_FLIP_NONE;
 
-	pieza = new Pieza;//Crear e inicializar pieza
+	//timer start
+	SDL_TimerID timerID = SDL_AddTimer(500, interrupcion, (void *)(_params.get()));
 		
 	while(true){
 	
-		//!Crear mecanismo para impedir repetición de piezas consecutivas
-		siguiente_pieza = new Pieza;
+		siguiente_pieza.reset(new Pieza);
 		pieza_bloqueada = false;
 
   		Uint32 frame_start, frame_end, frame_duration; //Variables para gestionar la tasa de refresco
@@ -266,17 +261,16 @@ void Game::game_run(){
 			}// No sale del bucle hasta que la cola de eventos es 0		
 			if(pieza_bloqueada){
 				std::cout<<"LA PIEZA HA SIDO BLOQUEADA"<<std::endl;					
-				delete pieza; //no funciona si la borro en el callback
-				pieza = siguiente_pieza;
+				//delete pieza; //no funciona si la borro en el callback
+				//pieza = siguiente_pieza;
+				pieza = std::move(siguiente_pieza);
 				break;
 			}
-			if(cerrar_programa)
-				break;
-			if(tablero_lleno)
+			if(cerrar_programa || tablero_lleno)
 				break;
 			if((_params.get())->interrupt_control){
 				(_params.get())->interrupt_control = false;
-				bajar_pieza_si_puede(pieza);
+				bajar_pieza_si_puede(pieza.get());
 			}
 				Actualiza_Pantalla(*pieza, *siguiente_pieza); //renderizado de tablero con piezas fijas y actual pieza moviéndose
 				
@@ -287,12 +281,7 @@ void Game::game_run(){
       			SDL_Delay(target_frame_duration - frame_duration);
     		}
 		}
-		if(cerrar_programa)
-			break;
-		if(tablero_lleno)
-			break;
 
-		pieza = siguiente_pieza;
     }
 	SDL_RemoveTimer(timerID); //To stop the timer
 }
