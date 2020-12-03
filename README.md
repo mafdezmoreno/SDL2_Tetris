@@ -1,7 +1,14 @@
 
 # SDL2_Tetris
 
-Juego de tetris creado empleando SDL2
+Tetris game based on SDL2
+
+## Requierements
+
+It's mandatory to link the following libraries:
+    1. SDL: https://www.libsdl.org/download-2.0.php
+    2. SDL_ttf: https://www.libsdl.org/projects/SDL_ttf/
+    3. SDL_
 
 ## Rubric Points
 

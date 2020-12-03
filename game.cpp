@@ -1,7 +1,7 @@
 #include "game.h"
 #include "texto.h"
 #include "tablero.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 //#include <SDL_thread.h>
 #include <sstream>
 #include <string>
@@ -234,12 +234,12 @@ void Game::game_run(){
 	Uint32 target_frame_duration = _kMsPerFrame;
 				
 	SDL_Event eventos;   // Gestor (cola) de eventos
-	SDL_RendererFlip flipType = SDL_FLIP_NONE;
+	//SDL_RendererFlip flipType = SDL_FLIP_NONE;
 
 	//timer start
 	SDL_TimerID timerID = SDL_AddTimer(500, interrupcion, (void *)(_params.get()));
 		
-	while(true){
+	//while(true){
 	
 		siguiente_pieza.reset(new Pieza);
 		pieza_bloqueada = false;
@@ -282,7 +282,7 @@ void Game::game_run(){
     		}
 		}
 
-    }
+    //}
 	SDL_RemoveTimer(timerID); //To stop the timer
 }
 

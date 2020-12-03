@@ -1,8 +1,8 @@
 #ifndef TEXTO_H
 #define TEXTO_H
 
-#include <SDL.h>
-#include <SDL_ttf.h> //! Necesaria
+#include "SDL2/SDL.h"
+#include "SDL2_ttf/SDL_ttf.h" //! Necesaria
 #include <string>
 #include <memory>
 #include <future>

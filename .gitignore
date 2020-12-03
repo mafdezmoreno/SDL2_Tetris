@@ -1,3 +1,6 @@
+DerivedData/
+Tetris.xcodeproj/
+Tetris/
 build/
 out/
 cmake/

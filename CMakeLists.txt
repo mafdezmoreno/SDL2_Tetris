@@ -6,8 +6,8 @@
 
 # Important: Move window.png into build folder or compile evrerythin in the work folder
 
-#set(CC "C:\\msys64\\mingw32\\bin\\gcc.exe")
-#set(CXX "C:\\msys64\\mingw32\\bin\\g++.exe")
+set(CC "gcc.exe")
+set(CXX "g++.exe")
 
 set (CMAKE_CXX_STANDARD 17)
 

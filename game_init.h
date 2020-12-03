@@ -2,7 +2,7 @@
 #define GAME_INIT_H
 
 #include "texto.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <memory>
 
 class Game_Init{

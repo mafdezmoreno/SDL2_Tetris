@@ -1,8 +1,10 @@
 #include "pieza.h"
 #include <time.h> 
 #include "constantes.h"
+#include <vector>
 #include <random>
 #include <chrono>
+
 
 void Pieza::Gira_Pieza_90(){
 	

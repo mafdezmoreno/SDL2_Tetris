@@ -5,8 +5,8 @@
 #include "pieza.h"
 #include "tablero.h"
 #include "constantes.h"
-#include <SDL.h>
-#include <SDL_thread.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_thread.h>
 #include "texto.h"
 #include "game_init.h"
 #include <memory>
