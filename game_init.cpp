@@ -181,7 +181,7 @@ bool Game_Init::inicializar()
 			std::cout<<"SDL_SetHint Error"<<std::endl;
 
 		// Creación de la ventana
-		_Ventana.reset(SDL_CreateWindow( "Tetris Udacity", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, ANCHO, ALTO, SDL_WINDOW_SHOWN ));
+		_Ventana.reset(SDL_CreateWindow( "Tetris Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, ANCHO, ALTO, SDL_WINDOW_SHOWN ));
 		if( _Ventana == NULL )
 		{
 			std::cout<< "SDL_CreateWindow Error: "<< SDL_GetError()  <<std::endl;

@@ -2,7 +2,6 @@
 #include "texto.h"
 #include "tablero.h"
 #include <SDL2/SDL.h>
-//#include <SDL_thread.h>
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -12,7 +11,7 @@
 #include <chrono>
 
 //! Constructor
-Game::Game(Game_Init& game_start)//, Interrupt_Param * param)
+Game::Game(Game_Init& game_start)
 	: _Ventana(nullptr, SDL_DestroyWindow), 
 	_Render (nullptr, SDL_DestroyRenderer){
 
@@ -182,9 +181,9 @@ void Game::Actualiza_Pantalla(Pieza &pieza, Pieza &siguiente_pieza){
 			if(!_Valor_Nivel->cargar_texto(std::to_string(_params->nivel))){
 				std::cout<< "No se ha podido renderizar el texto del nivel" <<std::endl;
 			}
-			_params->nivel_previo!=_params->nivel;
+			_params->nivel_previo = _params->nivel;
 		}
-		_params->puntuacion_previa=_params->puntuacion;
+		_params->puntuacion_previa = _params->puntuacion;
 	}
 
 	// Renderiza el texto
@@ -239,7 +238,7 @@ void Game::game_run(){
 	//timer start
 	SDL_TimerID timerID = SDL_AddTimer(500, interrupcion, (void *)(_params.get()));
 		
-	//while(true){
+	while(true){
 	
 		siguiente_pieza.reset(new Pieza);
 		pieza_bloqueada = false;
@@ -261,8 +260,6 @@ void Game::game_run(){
 			}// No sale del bucle hasta que la cola de eventos es 0		
 			if(pieza_bloqueada){
 				std::cout<<"LA PIEZA HA SIDO BLOQUEADA"<<std::endl;					
-				//delete pieza; //no funciona si la borro en el callback
-				//pieza = siguiente_pieza;
 				pieza = std::move(siguiente_pieza);
 				break;
 			}
@@ -274,15 +271,17 @@ void Game::game_run(){
 			}
 				Actualiza_Pantalla(*pieza, *siguiente_pieza); //renderizado de tablero con piezas fijas y actual pieza moviéndose
 				
-			// Para asegurar un refresco máximo de 60Hz
+			// Para asegurar un refresco de 60Hz
 			frame_end = SDL_GetTicks();
     		frame_duration = frame_end - frame_start;
 			if (frame_duration < target_frame_duration) {
       			SDL_Delay(target_frame_duration - frame_duration);
     		}
 		}
-
-    //}
+        
+        if(cerrar_programa || tablero_lleno)
+            break;
+    }
 	SDL_RemoveTimer(timerID); //To stop the timer
 }
 
@@ -295,17 +294,17 @@ void Game::bajar_pieza_si_puede(Pieza* p_pieza){
 			std::cout<< "PIEZA BAJADA AUTOMÁTICAMENTE "<<std::endl;
 			Actualiza_Tablero_Dinamico(*p_pieza, *_tablero_dinamico);
 			//std::cout<< "TABLERO DINAMICO  "<<std::endl;
-			//_tablero_dinamico->imprime_tabla();//para debug en consola
+			//_tablero_dinamico->imprime_tabla(); // debug
 			//std::cout<< "TABLERO ESTATICO "<<std::endl;
-			//_tablero_estatico->imprime_tabla();//para debug en consola
+			//_tablero_estatico->imprime_tabla(); // debug
 		}
 		else{
 			// Cuando no se puede bajar, aquí se pasa la pieza al tablero estático
-			Actualiza_Tablero_Estatico(*p_pieza, *_tablero_estatico);//borra filas ocupadas
+			Actualiza_Tablero_Estatico(*p_pieza, *_tablero_estatico); //borra filas ocupadas
 
 			std::cout<< "TABLERO ESTATICO COPIADO AL DINAMICO. ELIMINADO DE HUECOS "<<std::endl;
 			*_tablero_dinamico = *_tablero_estatico; //	Deep Copy (copy assignment)
-			_tablero_estatico->imprime_tabla(); //para debug en consola
+			_tablero_estatico->imprime_tabla(); // debug
 			pieza_bloqueada = true;
 			
 			if(p_pieza->coordenada.y_fila<=1){
@@ -319,7 +318,7 @@ void Game::bajar_pieza_si_puede(Pieza* p_pieza){
 void Game::Dibuja_tablero(){
 
 	SDL_Rect cuadrado = { REJILLA, REJILLA, COLUMNAS* REJILLA , FILAS* REJILLA};
-	SDL_SetRenderDrawColor( _Render.get(), 0x00, 0x00, 0x00, 0x00 );   //Borde tablero en negro    
+	SDL_SetRenderDrawColor( _Render.get(), 0x00, 0x00, 0x00, 0x00 );   //Set in black the borders of the board
 	SDL_RenderDrawRect( _Render.get(), &cuadrado );
 }
 
