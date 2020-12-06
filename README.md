@@ -1,67 +1,161 @@
 
 # SDL2_Tetris
 
-Tetris game based on SDL2
+Simple tetris game using [sdl2](https://www.libsdl.org/index.php) libraries
 
-## Requierements
+![](Tetris_10.gif)
 
-It's mandatory to link the following libraries:
-    1. SDL: https://www.libsdl.org/download-2.0.php
-    2. SDL_ttf: https://www.libsdl.org/projects/SDL_ttf/
-    3. SDL_
+## Structure
+
+1. game_Init:
+
+- It is responsible for rendering the initial screen of the game.
+- It asks for the user's name and stores it.
+
+2. game:
+
+- Contains the tetris operation algorithm in the `game_run()` function. Furthermore, this function is the one that contains the main loop of the program.
+
+- It represents graphically all the pieces, board and information of the state of the game.
+
+- It contains an interruption function in charge of indicating when the piece must go down.
+
+- Manage the state of the game by storing the pieces and occupied board positions in a boolean table.
+
+4. pieza:
+
+- Contains information about the tetris pieces.
+- Contains a random generator of parts and colors.
+- Contains functions responsible for turning the pieces
+
+5. tablero:
+
+It's in charge of managing a boolean table with information about the board (elimination of complete rows, compacting the board, checking if a piece can be moved ...)
+
+6. texto
+
+Class with functions for rendering text and managing rendered textures of text.
+
+## Compatibility
+
+It has been tested on Linux, Windows and Mac OS (including the new M1)
+
+## Dependencies for Running Locally
+
+### cmake >= 3.7
+
+All OSes: click [here](https://cmake.org/install/) for installation instructions
+
+### __make >= 4.1 (Linux), 3.81 (Mac and Windows)__
+
+- Linux: make is installed by default on most Linux distros
+- Mac: install Xcode command line tools to get make
+- Windows: install MingGW (including mingw32-make). I recommend to simply download and decompress the collection of tools [Winlibs](http://winlibs.com)
+
+### __SDL2 >= 2.0__
+
+A very good installations instructions can be found on [Lazyfoo](https://lazyfoo.net/tutorials/SDL/01_hello_SDL/index.php)
+
+Development Libraries requiered:
+
+1. SDL: https://www.libsdl.org/download-2.0.php
+2. SDL_ttf: https://www.libsdl.org/projects/SDL_ttf/
+
+__Note for Linux__ an apt or apt-get installation is preferred to building from source.
+
+__Note for Windows 1__: you have to adapt the sdl2-config.cmake with your SDL2 folder localization. For example:
+
+```bash
+set(prefix "C:/mingw_dev_lib")
+set(SDL2_PREFIX "C:/sdl2_dev_lib")
+set(SDL2_EXEC_PREFIX "C:/sdl2_dev_lib")
+...
+```
+
+__Note for Windows 2:__ to avoid problems in windows, use the 32bits version of the libraries.
+
+### __gcc/g++ >= 5.4__
+
+- Linux: gcc / g++ is installed by default on most Linux distros
+- Mac: same deal as make - install Xcode command line tools
+- Windows: recommend using MinGW. Included in  [Winlibs](http://winlibs.com)
+
+## Basic Build Instructions in Linux and Mac OS (using command tools)
+
+1. Clone this repo: `git clone ...`.
+2. Make a build directory in the top level directory: `mkdir build && cd build`
+3. Compile: `cmake .. && make`
+4. Run it: `./Tetris`.
+
+## Basic Build Instrutions in Windows using MinGW
+
+1. Clone this repo: `git clone ...`
+2. Run cmake: `cmake -B build -G "MinGW Makefiles"`
+3. Go into build direcctory: `cd build`
+4. Run make (MinGW): `mingw32-make`
+5. Run it: `./Tetris.exe`.
+
+__Note:__ To make this commands works in terminal it will be need to add the folder of the tools to a system (or user) PATH.
+
+## Basic Build Instructions in Xcode
+
+To configure the project correctly I recommend to use the instruction of [Lazyfoo](https://lazyfoo.net/tutorials/SDL/01_hello_SDL/mac/xcode/index.php)
+
+If you are using a new M1 processor, make sure that you are executting Xcode under Rosetta 2. The SDL2 library doesn't works for M1 processor, unless you use that tool.
 
 ## Rubric Points
 
 ### README (All Rubric Points REQUIRED)
 
-- [] A README with instructions is included with the project
+- [X] A README with instructions is included with the project
   - The README is included with the project and has instructions for building/running the project.
   - If any additional libraries are needed to run the project, these are indicated with cross-platform installation instructions.
   - You can submit your writeup as markdown or pdf.
 
-- [] The README indicates which project is chosen.
-  - [] The README describes the project you have built.
-  - [] The README also indicates the file and class structure, along with the expected behavior or output of the program.
+- [X] The README indicates which project is chosen.
+  - [X] The README describes the project you have built.
+  - [X] The README also indicates the file and class structure, along with the expected behavior or output of the program.
 
-- [] The README includes information about each rubric point addressed.
-  - The README indicates which rubric points are addressed. 
+- [X] The README includes information about each rubric point addressed.
+  - The README indicates which rubric points are addressed.
   - The README also indicates where in the code (i.e. files and line numbers) that the rubric points are addressed.
 
 ### Compiling and Testing (All Rubric Points REQUIRED)
 
-- [] The submission must compile and run.
-  - [] The project code must compile and run without errors.
-  - [] We strongly recommend using ```cmake``` and ```make```, as provided in the starter repos. If you choose another build system, the code must compile on any reviewer platform.
+- [X] The submission must compile and run.
+  - [X] The project code must compile and run without errors.
+  - [X] We strongly recommend using ```cmake``` and ```make```, as provided in the starter repos. If you choose another build system, the code must compile on any reviewer platform.
 
 ### Loops, Functions, I/O
 
-- [] The project demonstrates an understanding of C++ functions and control structures.
+- [X] The project demonstrates an understanding of C++ functions and control structures.
   - A variety of control structures are used in the project.
   - The project code is clearly organized into functions.
 
-- [] The project reads data from a file and process the data, or the program writes data to a file.
-  - [] The project reads data from an external file or writes data to a file as part of the necessary operation of the program.
+- [X] The project reads data from a file and process the data, or the program writes data to a file.
+  - The project reads data from an external file or writes data to a file as part of the necessary operation of the program.
 
-- The project accepts user input and processes the input.
-  - [] The project accepts input from a user as part of the necessary operation of the pr
+  In `game_close.cpp`, line 91: `Game_Close::registar_puntuacion()`.
+  
+- [X]The project accepts user input and processes the input: In function gamepantalla_pedir_nombre
+  - [X] The project accepts input from a user as part of the necessary operation of the program. 
+
+  In `game_init.cpp`, line 65: `Game_Init::pantalla_pedir_nombre()`.
+
 
 ### Object Oriented Programming
 
-- [] The project uses Object Oriented Programming techniques. The project code is organized into classes with class attributes to hold the data, and class methods to perform tasks.
-- [] Classes use appropriate access specifiers for class members. All class data members are explicitly specified as public, protected, or private.
-- [] Class constructors utilize member initialization lists. All class members that are set to argument values are initialized through member initialization lists.
-
-- [] Classes abstract implementation details from their interfaces. All class member functions document their effects, either through function names, comments, or formal documentation. Member functions do not change program state in undocumented ways.
-
-- [] Classes encapsulate behavior. Appropriate data and functions are grouped into classes. Member data that is subject to an invariant is hidden from the user. State is accessed via member functions.
-
+- [X] The project uses Object Oriented Programming techniques. The project code is organized into classes with class attributes to hold the data, and class methods to perform tasks.
+- [X] Classes use appropriate access specifiers for class members. All class data members are explicitly specified as public, protected, or private.
+- [X] Class constructors utilize member initialization lists. All class members that are set to argument values are initialized through member initialization lists.
+- [X] Classes abstract implementation details from their interfaces. All class member functions document their effects, either through function names, comments, or formal documentation. Member functions do not change program state in undocumented ways.
+- [X] Classes encapsulate behavior. Appropriate data and functions are grouped into classes. Member data that is subject to an invariant is hidden from the user. State is accessed via member functions.
 - [] Classes follow an appropriate inheritance hierarchy. Inheritance hierarchies are logical. Composition is used instead of inheritance when appropriate. Abstract classes are composed of pure virtual functions. Override functions are specified.
 
-- [] Overloaded functions allow the same function to operate on different parameters. One function is overloaded with different signatures for the same function name.
+- [X] Overloaded functions allow the same function to operate on different parameters. One function is overloaded with different signatures for the same function name.
+- [X] Derived class functions override virtual base class functions. One member function in an inherited class overrides a virtual base class member function.
 
-- [] Derived class functions override virtual base class functions. One member function in an inherited class overrides a virtual base class member function.
-
-- [x] Templates generalize functions in the project. One function is declared with a template that allows it to accept a generic parameter: ```template <class T> void Texto::renderizar(const T &x, const T &y)``` in ```texto.h```.
+- [X] Templates generalize functions in the project. One function is declared with a template that allows it to accept a generic parameter: ```template <class T> void Texto::renderizar(const T &x, const T &y)``` in ```texto.h```.
 
 ### Memory Management
 
