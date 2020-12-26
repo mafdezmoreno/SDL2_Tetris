@@ -3,7 +3,6 @@ Tetris.xcodeproj/
 Tetris/
 build/
 out/
-cmake/
 notas/
 CMakeFiles/
 .vscode/
