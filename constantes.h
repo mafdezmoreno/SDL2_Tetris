@@ -1,19 +1,19 @@
 #ifndef CONSTANTES_H
 #define CONSTANTES_H
 
-// CONSTANTES
-const int REJILLA = 20; //píxeles
+// Minimum dimension of the game graphics in pixels
+const int REJILLA = 20;
 
-//dimensiones del tablero 
+// Number of rows and columns for the board
 const int COLUMNAS = 8;
 const int FILAS = 12;
 
-//Dimensiones de la ventana. Se adaptan a las del tablero
+// Window dimensions
 const int ANCHO = (COLUMNAS + 12) * REJILLA;
 const int ALTO = (FILAS + 2) * REJILLA;
 
 
-//Códigos de colores para piezas y renderizados
+// color code for rendering
 const int colores[16][3]     = {{0,0,0},            //0 black 
                                 {255,255,255},      //1 white
                                 {0xC0,0xC0,0xC0},   //2 silver

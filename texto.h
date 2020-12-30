@@ -2,14 +2,14 @@
 #define TEXTO_H
 
 #include "SDL2/SDL.h"
-#include "SDL2_ttf/SDL_ttf.h" //! Necesaria
+#include "SDL2_ttf/SDL_ttf.h"
 #include <string>
 #include <memory>
 #include <future>
 #include <thread>
 #include <utility>
 
-//Clase para el renderizado del texto
+// To render text on the screen
 class Texto
 {
 	public:
@@ -21,11 +21,10 @@ class Texto
 			SDL_RenderCopyEx( _Render.get(), _Textura.get(), nullptr, &Cuadrado, 0, nullptr, SDL_FLIP_NONE );
 		}
 
-		int get_ancho();
-		std::string get_cadena_texto();
-		bool cargar_texto(std::string inputText);
-
-		void init_full(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render); // con llamada a la función cargar texto
+		int get_ancho();  // Returns the width in pixels of the rendered text
+		std::string get_cadena_texto(); // Returns the text string rendered
+		bool cargar_texto(std::string inputText); // Render the text (to show it graphically in the window)
+		void init_full(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render); // Includes a call to the "cargar_texto" function
 		void init(std::shared_ptr<SDL_Renderer> ext_render);
 		
 		// Default Constructor
@@ -46,15 +45,14 @@ class Texto
 		Texto& operator=(Texto&& original) noexcept;
 		
 	private:
-		void _set_cadena_texto(std::string texto);
-
+		void _set_cadena_texto(std::string texto); // Store the text string
 
 		std::shared_ptr<SDL_Renderer> _Render;
-		std::string _cadena_texto;
+		std::string _cadena_texto; // Text string rendered
 		std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> _Textura;
 
-		int _ancho{0};
-		int _alto{0};
+		int _ancho{0}; 	// Width in pixels of the rendered text
+		int _alto{0};	// Height in pixels of the rendered text
 };
 
 #endif

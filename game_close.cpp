@@ -12,7 +12,7 @@ Game_Close::Game_Close(Game& game, Game_Init& game_init)
 
 	std::cout<<"Game_Close Construido "<<this<< std::endl;
 	
-	//move all the rendered text
+	//move all the rendered text from game
 	_Texto_Jugador = game.get_Texto_Jugador();
     _Nombre_Jugador = game.get_nombre_jugador();
     _Texto_Puntuacion = game.get_Texto_Puntuacion();
@@ -22,8 +22,8 @@ Game_Close::Game_Close(Game& game, Game_Init& game_init)
 	_pulsa_intro_continuar = game_init.get_pulsa_intro_continuar();
 	
 	//move window and render
-	_Ventana = std::move(game._Ventana);     // Ventana
-	_Render = std::move(game._Render);      // Elementos a renderizar en interior
+	_Ventana = std::move(game._Ventana);
+	_Render = std::move(game._Render);
 	
 	//get info to write into .txt
 	_puntuacion = game.get_puntuacion();
@@ -46,7 +46,7 @@ void Game_Close::mostrar_puntuacion(){
 
 	SDL_Event eventos;
 
-	//Reinicia la ventana
+	//Creation of new window
 	SDL_SetRenderDrawColor( _Render.get(), 0xFF, 0xFF, 0xFF, 0xFF );
 	SDL_RenderClear( _Render.get() );
 
@@ -61,7 +61,7 @@ void Game_Close::mostrar_puntuacion(){
 
 	_pulsa_intro_continuar->renderizar( (ANCHO - _pulsa_intro_continuar->get_ancho())/2 , 11*REJILLA );
 
-	SDL_RenderPresent( _Render.get() );//Actualiza la pantalla
+	SDL_RenderPresent( _Render.get() ); // Refresh the window
 
 
 	while( !quit )
@@ -76,7 +76,7 @@ void Game_Close::mostrar_puntuacion(){
 			}
 
 			else if( eventos.type == SDL_KEYDOWN )
-			{	//para finalizar pulsando enter tmb
+			{	// It allows to end the game by pressing enter
 				if(eventos.key.keysym.scancode == SDL_SCANCODE_RETURN)
 				{
 					quit = true;
@@ -100,7 +100,6 @@ void Game_Close::registar_puntuacion(){
     auto now = std::chrono::system_clock::now();
     std::time_t time = std::chrono::system_clock::to_time_t(now);
 
-	//!Segmentation fault
     fileData <<"Nombre: " << _nombre<< ", Nivel: "<< *_nivel  
 			<< ", Puntuacion: "<<*_puntuacion 
 			<< ", Fecha: "<<std::ctime(&time) << std::endl;
@@ -118,11 +117,9 @@ void Game_Close::registar_puntuacion(){
 
 }
 
-
 void Game_Close::_cerrar(){
-	
-	
-	//Cierra Componentes de SDL
+
+	//Releases the memory that some SDL components reserve
 	SDL_Quit();
 	TTF_Quit();
 

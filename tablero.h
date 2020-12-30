@@ -11,23 +11,23 @@ class Interrupt_Param;
 class Tablero{
 	public:
 
-        //Funciones de modificacion
-        void intro_coord_tabla(Pieza &pieza); //ocupa el espacio de la tabla con las coordenadas de la pieza
-        void borra_coord_tabla(Pieza &pieza); //libera el hueco tras el movimiento de la pieza. Solo necesario para una correcta visualización del tablero logico
-        void imprime_tabla();   //imprime _tablero (lógico), con un "1" en casilla ocupada
+        // Board Modification Functions
+        void intro_coord_tabla(Pieza &pieza); // Fill the space of the part on the board
+        void borra_coord_tabla(Pieza &pieza); // Releases the space of the part on the board.
+        void imprime_tabla();   // Print the logic board. For debugging purposes
         void copiar_tableros(std::vector<std::vector<bool>> &dinamico, std::vector<std::vector<bool>> &estatico);
 
-        //Comprobaciones de cabida/movimiento
-        bool comprueba_cabe_pieza(Pieza &pieza);  //actualiza posición de pieza y comprueba si cabe en nueva posición
-        bool Comprueba_bajada(Pieza &pieza);
-        bool Comprueba_derecha(Pieza &pieza);
-        bool Comprueba_izquierda(Pieza &pieza);
-        bool Comprueba_giro(Pieza &pieza);
+        // Checking parts fitting/motion
+        bool comprueba_cabe_pieza(Pieza &pieza);    // Check if the part fits in a new position
+        bool Comprueba_bajada(Pieza &pieza);        // Check the descent of the piece
+        bool Comprueba_derecha(Pieza &pieza);       // Check the movement to the right
+        bool Comprueba_izquierda(Pieza &pieza);     // Check the movement to the left
+        bool Comprueba_giro(Pieza &pieza);          // Check the possibility of rotation
 
-        //Compactado tabla
+        // To remove the filled rows of the board
         void eliminar_filas_llenas();
 
-        //get value position
+        // To obtain the cell value in a particular position
         bool get_position(int fila, int columna);
 
         //! Default constructor
@@ -48,20 +48,22 @@ class Tablero{
 
     private:
 
-        //Funciones que usa eliminar_filas_llenas();
+        // Funtions called by eliminar_filas_llenas();
         bool comprobar_fila_llena(int fila);
         bool comprobar_fila_vacia(int fila);
-        std::vector<int> comprobar_filas_tabla();
+        std::vector<int> comprobar_filas_tabla(); // Returns a vector that contains the filled rows
         void compactar_filas_tabla(int fila);
         void copiado_filas(int fila);
 
-        //Cambia el valor de una casilla de _tablero
+        // To change the value of the cells of the boards
         int set_cuadro (Coordenada &coordenada, bool tipo);
+        
+        // Set the boolean board to 0 and the borders to 1
         void _init_tablero();
 
-        //variables
+        // Variables
         std::shared_ptr<Interrupt_Param> _incrementar_puntuacion;
-        std::vector<std::vector<bool>> _tablero; //Posiciones ocupadas del tablero
+        std::vector<std::vector<bool>> _tablero; // Store the filled cells of the board
 };
 
 #endif

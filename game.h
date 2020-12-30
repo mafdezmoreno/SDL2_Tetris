@@ -14,8 +14,10 @@
 class Tablero;
 class Pieza;
 
+// Interrupt function to activate the descent of the part
 Uint32 interrupcion(Uint32 interval, void *param);
 
+// Class that stores the basic management parameters of the game
 class Interrupt_Param
 {
 	public:
@@ -25,7 +27,7 @@ class Interrupt_Param
             nivel_previo = -1;
             puntuacion_previa = -1;
         }
-		bool interrupt_control; //para bajar la pieza
+		bool interrupt_control; // To manage when the part can be moved down
 		int nivel;
         int puntuacion;
         int nivel_previo;
@@ -37,7 +39,7 @@ class Game{
 
     public:
 
-        Game(Game_Init& game_start);//, Interrupt_Param * param);
+        Game(Game_Init& game_start);
         ~Game();
         
         void Mueve_Pieza_Si_Se_Puede(const SDL_Keycode& tecla, Pieza &pieza, Tablero &tablero);
@@ -61,16 +63,13 @@ class Game{
     
         // https://stackoverflow.com/questions/48672399/is-it-possible-to-use-sdl2-with-smart-pointers
         std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> _Ventana;
-        //std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> _Render;
-        
         std::shared_ptr<SDL_Renderer> _Render;
 
     
     private:
 
-        bool _inicializar(); // Inicializa SDL y crea la ventana
-        bool _init_timer(); // Inicializa SDL y crea la ventana
-        void Dibuja_tablero();
+        bool _inicializar();   // Initialize SDL and create the window
+        void Dibuja_tablero(); // Draw the edges of the board
 
         bool pieza_bloqueada;
         bool tablero_lleno = false;
@@ -88,8 +87,8 @@ class Game{
         std::unique_ptr<Texto> _Texto_Jugador;
         std::unique_ptr<Texto> _Valor_Puntuacion;
 
-        std::unique_ptr<Tablero> _tablero_dinamico; //Para comprobar los movimientos de las piezas
-        std::unique_ptr<Tablero> _tablero_estatico; //Para guardar las piezas fijas.
+        std::unique_ptr<Tablero> _tablero_dinamico; // To check the movements of the parts
+        std::unique_ptr<Tablero> _tablero_estatico; // To store the locked parts
 
 };
 

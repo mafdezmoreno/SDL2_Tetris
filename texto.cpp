@@ -5,13 +5,8 @@
 #include <thread>
 #include <mutex>
 
-// Crear un constructor vacío, para poder llamar a con std::thread a una función init de la clase que se encarge de la inicialización de las variables en paralelo:
-// init(std::shared_ptr<SDL_Renderer> ext_render)
-// init_full(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render,) // con llamada a la función cargar texto
 
-//void Texto::init(std::shared_ptr<SDL_Renderer> ext_render){}
-
-void Texto::init(std::shared_ptr<SDL_Renderer> ext_render) // con llamada a la función cargar texto
+void Texto::init(std::shared_ptr<SDL_Renderer> ext_render) // sin llamar a la función cargar texto
 {
 	_ancho = 0;
 	_alto = 0;
@@ -38,7 +33,7 @@ _Render (nullptr),
 _ancho (0),
 _alto (0)
 {
-	std::cout << "Texto Default Constructor " << this << ": "<<std::endl;
+	std::cout << "Default Texto Constructor " << this << ": "<<std::endl;
 }
 
 //! Constructor II
@@ -48,10 +43,10 @@ _Textura (nullptr, SDL_DestroyTexture)
 	_Render = ext_render;
 	_ancho = 0;
 	_alto = 0;
-	std::cout << "Texto Constructor II" << this << ": "<<std::endl;
+	std::cout << "Text Constructor II" << this << ": "<<std::endl;
 }
 
-//! Constructor II
+//! Constructor III
 Texto::Texto(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render):
 _Textura (nullptr, SDL_DestroyTexture)
 {
@@ -62,7 +57,7 @@ _Textura (nullptr, SDL_DestroyTexture)
     std::lock_guard<std::mutex> mi_guard(mi_mutex);
 	_Render = ext_render;
 	cargar_texto(texto_renderizar);
-	std::cout << "Texto Constructor III" << this << ": ";
+	std::cout << "Text Constructor III" << this << ": ";
 	std::cout << _cadena_texto <<" "<<_Textura.get() <<std::endl;
 }
 
@@ -77,16 +72,13 @@ _Textura(nullptr, SDL_DestroyTexture)
 	_ancho = original._ancho;
 	_alto = original._alto;
 
-	cargar_texto(_cadena_texto); //_Textura can't be copied, it's a unique pointer
-
-	//std::cout << "Texto Copy Costructor " << this << ": ";
-	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
+	cargar_texto(_cadena_texto);
 }
 
 //! Copy assignment operator
 Texto& Texto::operator=(const Texto& original){
 	
-	if (this == &original)  // prevención auto asignación
+	if (this == &original)  // self-assignment protection
     	return *this;
 
 	_Render = original._Render;
@@ -95,8 +87,6 @@ Texto& Texto::operator=(const Texto& original){
 	_alto = original._alto;
 
 	cargar_texto(_cadena_texto);
-	//std::cout << "Texto Copy assignment operator " << this << ": ";
-	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 
 	return *this;
 }
@@ -111,16 +101,12 @@ _Textura(nullptr, SDL_DestroyTexture)
 	_cadena_texto = std::move(original._cadena_texto);
 	_ancho = std::move(original._ancho);
 	_alto = std::move(original._alto);
-	//original._Textura = nullptr;
-	//original._Render = nullptr;
-	//std::cout << "Texto Move constructor " << this << ": ";
-	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 }
 
 //! Move assignment operator
 Texto& Texto::operator=(Texto&& original) noexcept{
 	
-	if (this == &original)  // prevención auto asignación
+	if (this == &original)  // self-assignment protection
     	return *this;
 
 	_Render = std::move(original._Render);
@@ -128,12 +114,6 @@ Texto& Texto::operator=(Texto&& original) noexcept{
 	_cadena_texto = std::move(original._cadena_texto);
 	_ancho = std::move(original._ancho);
 	_alto = std::move(original._alto);
-
-	//original._Textura = nullptr;
-	//original._Render = nullptr;
-
-	//std::cout << "Texto Move assignment operator " << this << ": ";
-	//std::cout << _cadena_texto <<" "<<_Textura <<std::endl;
 
 	return *this;
 }
@@ -153,12 +133,16 @@ std::string Texto::get_cadena_texto(){
 
 	return _cadena_texto;
 }
+
+// Store the text string to be rendered later
 void Texto::_set_cadena_texto(std::string texto){
 
 	std::cout<<"setted "<< texto << " on " <<this<< std::endl;
 	_cadena_texto = texto;
 }
 
+
+// Converts the input string into rendered text for display in our game
 bool Texto::cargar_texto(std::string inputText)
 {
 
@@ -175,7 +159,6 @@ bool Texto::cargar_texto(std::string inputText)
 		return false;
 	}
 
-	//_cadena_texto = inputText;//! usar set cadena de texto
 	_set_cadena_texto(inputText);
 	
 	std::unique_ptr<SDL_Surface, std::function<void(SDL_Surface*)>> 

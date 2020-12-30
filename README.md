@@ -154,6 +154,8 @@ If you are using a new M1 processor, make sure that you are executting Xcode und
 
 - [ ] Classes follow an appropriate inheritance hierarchy. Inheritance hierarchies are logical. Composition is used instead of inheritance when appropriate. Abstract classes are composed of pure virtual functions. Override functions are specified.
 
+  - Inheritance not used
+
 - [X] Overloaded functions allow the same function to operate on different parameters. One function is overloaded with different signatures for the same function name.
 
   - For example, in `texto.h`, there are three overloaded Constructors:
@@ -177,13 +179,15 @@ Texto(std::string texto_renderizar, std::shared_ptr<SDL_Renderer> ext_render);
 
 - [X] The project uses destructors appropriately: At least one class that uses unmanaged dynamically allocated memory, along with any class that otherwise needs to modify state upon the termination of an object, uses a destructor.
 
-  - Destructors have been created in almost classes to perform the debugging of the program, but in normal operation they are not necessary, because intelligent pointers are used (some of them even with custom deleters)
+  - Destructors have been created in almost classes to perform the debugging of the program, but in normal operation they are not necessary, because smart pointers are used (some of them even with custom deleters).
+
+  - The destructor of `Game_Close` (`game_close.h`) calls the function `_cerrar()` which liberates the memory allocated by some SDL component in `Game_Init`(`game_init.h`), function `inicialiar()`, called by the constructor of the class.
 
 - [X] The project uses scope / Resource Acquisition Is Initialization (RAII) where appropriate: The project follows the Resource Acquisition Is Initialization pattern where appropriate, by allocating objects at compile-time, initializing objects when they are declared, and utilizing scope to ensure their automatic destruction.
 
 - [X] The project follows the Rule of 5: For all classes, if any one of the copy constructor, copy assignment operator, move constructor, move assignment operator, and destructor are defined, then all of these functions are defined.
 
-  - Clases `tablero.h` and `texto.h` implements rule of five.
+  - Classes `tablero.h` and `texto.h` implements rule of five.
 
 - [X] The project uses move semantics to move data, instead of copying it, where possible: For classes with move constructors, the project returns objects of that class by value, and relies on the move constructor, instead of copying the object.
 

@@ -97,10 +97,10 @@ bool Tablero::Comprueba_bajada(Pieza &pieza){
 
 bool Tablero::Comprueba_derecha(Pieza &pieza){
     
-    Pieza buffer = pieza;
-    buffer.coordenada.x_columna = buffer.coordenada.x_columna + 1; //bajo la pieza copiada
-    buffer.pieza_a_coordenadas(); //actualizo el set de coordenadas de la pieza
-    if(comprueba_cabe_pieza(buffer) == true){//compruebo si cabe la pieza
+    Pieza buffer = pieza; // Creates a temp part
+    buffer.coordenada.x_columna = buffer.coordenada.x_columna + 1; //Move down the temp part
+    buffer.pieza_a_coordenadas(); // Updates de coordinates of the temp part
+    if(comprueba_cabe_pieza(buffer) == true){ // The part is checked to see if it fits
         std::cout<<"La pieza " << &pieza << " puede ir a la derecha"<<std::endl;
         return true;
     }
@@ -110,11 +110,10 @@ bool Tablero::Comprueba_derecha(Pieza &pieza){
 
 bool Tablero::Comprueba_izquierda(Pieza &pieza){
     
-    Pieza buffer = pieza; //crea una nueva pieza
-    buffer.coordenada.x_columna = buffer.coordenada.x_columna - 1; //bajo la pieza copiada
-    buffer.pieza_a_coordenadas(); //actualizo el set de coordenadas de la pieza
-    if(comprueba_cabe_pieza(buffer) == true){//compruebo si cabe la pieza
-        //std::cout<<"La pieza " << &pieza << " puede ir a la derecha"<<std::endl;
+    Pieza buffer = pieza;
+    buffer.coordenada.x_columna = buffer.coordenada.x_columna - 1;
+    buffer.pieza_a_coordenadas();
+    if(comprueba_cabe_pieza(buffer) == true){ 
         return true;
     }
     std::cout<<"La pieza " << &pieza <<" no puede ir a la izquierda"<<std::endl;
@@ -123,10 +122,10 @@ bool Tablero::Comprueba_izquierda(Pieza &pieza){
 
 bool Tablero::Comprueba_giro(Pieza &pieza){
     
-    Pieza buffer = pieza; //crea una nueva pieza
+    Pieza buffer = pieza; 
     buffer.Gira_Pieza_90();
-    buffer.pieza_a_coordenadas(); //actualizo el set de coordenadas de la pieza
-    if(comprueba_cabe_pieza(buffer) == true){//compruebo si cabe la pieza
+    buffer.pieza_a_coordenadas(); 
+    if(comprueba_cabe_pieza(buffer) == true){ 
        
         return true;
     }
@@ -134,19 +133,18 @@ bool Tablero::Comprueba_giro(Pieza &pieza){
     return false;
 }
 
-bool Tablero::comprueba_cabe_pieza(Pieza &pieza){ //devuelve true si cabe y false si no cabe
-    //pieza.imprime_set_coordenadas();
-    for ( int i = 0 ; i < pieza.set_coordenadas.size() ; i++) {    //vertical
-        if(_tablero[pieza.set_coordenadas[i].y_fila][pieza.set_coordenadas[i].x_columna]== true){ //Si está ocupado la pieza no cabe
+bool Tablero::comprueba_cabe_pieza(Pieza &pieza){ // Returns true if the part fits
+    
+    for ( int i = 0 ; i < pieza.set_coordenadas.size() ; i++) {    // Vertical
+        if(_tablero[pieza.set_coordenadas[i].y_fila][pieza.set_coordenadas[i].x_columna]== true){ // True = occupied
             std::cout<<"La pieza " << &pieza <<" no cabe"<<std::endl;
             return false;
         }
     }
-    //std::cout<<"La pieza " << &pieza <<" cabe en el tablero"<<std::endl;
     return true;
 }
 
-void Tablero::imprime_tabla(){
+void Tablero::imprime_tabla(){ // Prints board to terminal
     		
     std::cout<<"Tablero "<<this<<std::endl;
     std::cout<<"   ";
@@ -167,7 +165,6 @@ void Tablero::imprime_tabla(){
     	else
         	std::cout<< fila  <<"|";
        	for ( int columna = 0 ; columna < _tablero[fila].size() ; columna++){
-        	//std::cout<<"  "<<_tablero[fila][columna];
             if(_tablero[fila][columna])
                 std::cout<<"  1";
             else
@@ -179,7 +176,7 @@ void Tablero::imprime_tabla(){
 }
 
 
-int Tablero::set_cuadro (Coordenada &coordenada, bool tipo){ // horizontal (fila) // vertical (columna)
+int Tablero::set_cuadro (Coordenada &coordenada, bool tipo){ // horizontal (row) // vertical (column)
 
     _tablero[coordenada.y_fila][coordenada.x_columna] = tipo;
     return 0;
@@ -187,13 +184,13 @@ int Tablero::set_cuadro (Coordenada &coordenada, bool tipo){ // horizontal (fila
 
 void Tablero::intro_coord_tabla(Pieza &pieza){
     std::cout<<"Pieza "<< &pieza <<" introducida en la tabla "<< this <<std::endl;
-    for ( int i = 0 ; i < pieza.set_coordenadas.size() ; i++)     //vertical
+    for ( int i = 0 ; i < pieza.set_coordenadas.size() ; i++)
         set_cuadro (pieza.set_coordenadas[i] , true);
 }
 
 void Tablero::borra_coord_tabla(Pieza &pieza){
     std::cout<<"Pieza "<< &pieza <<" borrada de la tabla "<< this <<std::endl;
-    for ( int i = 0 ; i < pieza.set_coordenadas.size() ; i++)     //vertical
+    for ( int i = 0 ; i < pieza.set_coordenadas.size() ; i++)     
         set_cuadro (pieza.set_coordenadas[i] , false);
 }
 
@@ -231,7 +228,7 @@ std::vector<int> Tablero::comprobar_filas_tabla(){
         else if(comprobar_fila_vacia(i))
             break;
     }
-    return filas_llenas; //vector con las filas ocupadas
+    return filas_llenas; // Vector that contains the filled rows
 }
 
 void Tablero::copiado_filas(int fila){
@@ -243,19 +240,16 @@ void Tablero::copiado_filas(int fila){
 
 void Tablero::compactar_filas_tabla(int fila){
 
-    //bool fila_vacia = false;
     std::cout<<"Compactado de fila "<< fila <<std::endl;
     int i;
     for(i=fila; i > 1; i--){
         std::cout<< i <<std::endl;
         copiado_filas(i);
         if(comprobar_fila_vacia(i)){
-            //std::cout<<"Fila vacia"<< std::endl;
-            //fila_vacia = true;
             break;
         }
     }
-    if(i==1){ //elimina la fila superior si tiene algún contenido tras el compactado
+    if(i==1){ // Remove the top row if it has any content after compacting the table
         int j = i;
         for(int i = 1; i<(_tablero[0].size()-1); i++)
             _tablero[j][i]=0;

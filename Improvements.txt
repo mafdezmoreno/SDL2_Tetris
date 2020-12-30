@@ -1,0 +1,11 @@
+Improvements
+
+List of potential improvements to be implemented in the game:
+
+1. Render only specific areas of the window, without cleaning the previous content
+2. Color in the filled slots of the board
+3. Improve mechanism to prevent repetition of consecutive pieces and of the same color
+4. Render game over on the final screen and allow to see the board in the background, after a transparency
+5. Move the part down completely by pressing enter
+6. Sort the score chart. Keep only the 5 highest scores, display them on screen and if these scores are exceeded, store the new score
+
