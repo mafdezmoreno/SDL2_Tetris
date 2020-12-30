@@ -28,6 +28,6 @@ add_executable(${CMAKE_PROJECT_NAME} main.cpp game_init.cpp game.cpp game_close.
 
 set(SDL2_LIBRARIES ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARY} ) # Includes the SLD2 libraries needed
 
-set(SDL2_LIBRARIES ${SDL2_LIBRARIES} -mconsole) # -mconsole, to force terminal printing 
+# set(SDL2_LIBRARIES ${SDL2_LIBRARIES} -mconsole) # -mconsole, to force terminal printing. Don't work on Linux
 
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})

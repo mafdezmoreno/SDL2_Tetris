@@ -2,7 +2,8 @@
 #define TEXTO_H
 
 #include "SDL2/SDL.h"
-#include "SDL2_ttf/SDL_ttf.h"
+//#include "SDL2_ttf/SDL_ttf.h" // Mac
+#include "SDL2/SDL_ttf.h" // Linux
 #include <string>
 #include <memory>
 #include <future>

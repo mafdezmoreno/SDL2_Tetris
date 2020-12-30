@@ -7,12 +7,12 @@ Simple tetris game using [sdl2](https://www.libsdl.org/index.php) libraries
 
 ## Structure
 
-1. game_Init:
+1. __game_Init__:
 
 - It is responsible for rendering the initial screen of the game.
 - It asks for the user's name and stores it.
 
-2. game:
+2. __game__:
 
 - Contains the tetris operation algorithm in the `game_run()` function. Furthermore, this function is the one that contains the main loop of the program.
 
@@ -22,17 +22,17 @@ Simple tetris game using [sdl2](https://www.libsdl.org/index.php) libraries
 
 - Manage the state of the game by storing the pieces and occupied board positions in a boolean table.
 
-4. pieza:
+4. __pieza__:
 
 - Contains information about the tetris pieces.
 - Contains a random generator of parts and colors.
 - Contains functions responsible for turning the pieces
 
-5. tablero:
+5. __tablero__
 
 It's in charge of managing a boolean table with information about the board (elimination of complete rows, compacting the board, checking if a piece can be moved ...)
 
-6. texto
+6. __texto__
 
 Class with functions for rendering text and managing rendered textures of text.
 
@@ -61,7 +61,10 @@ __Development Libraries requiered:__
 1. SDL: https://www.libsdl.org/download-2.0.php
 2. SDL_ttf: https://www.libsdl.org/projects/SDL_ttf/
 
-__Note for Linux__ an apt or apt-get installation is preferred to building from source.
+__Note for Linux__ an apt or apt-get installation is preferred to building from source:
+  
+- SDL: `sudo apt install libsdl2-dev libsdl2-2.0-0 -y`
+- SDL_ttf: `sudo apt install libfreetype6-dev libsdl2-ttf-dev libsdl2-ttf-2.0-0 -y`
 
 __Note for Windows 1__: you have to adapt the sdl2-config.cmake with your SDL2 folder localization. For example:
 
@@ -101,7 +104,7 @@ __Note:__ To make this commands works in terminal it will be need to add the fol
 
 To configure the project correctly I recommend to use the instruction of [Lazyfoo](https://lazyfoo.net/tutorials/SDL/01_hello_SDL/mac/xcode/index.php)
 
-If you are using a new M1 processor, make sure that you are executting Xcode under Rosetta 2. The SDL2 library doesn't works for M1 processor, unless you use that tool.
+If you are using a new M1 processor, make sure that you are running Xcode under Rosetta 2. The SDL2 library doesn't works for M1 processor, unless you use that tool.
 
 ## Rubric Points
 
@@ -137,7 +140,7 @@ If you are using a new M1 processor, make sure that you are executting Xcode und
 
   In `game_close.cpp`, line 91: `Game_Close::registar_puntuacion()`.
   
-- [X] The project accepts user input and processes the input: In function gamepantalla_pedir_nombre
+- [X] The project accepts user input and processes the input:
   - [X] The project accepts input from a user as part of the necessary operation of the program. In `game_init.cpp`, line 65: `Game_Init::pantalla_pedir_nombre()`.
 
 ### Object Oriented Programming

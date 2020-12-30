@@ -149,7 +149,8 @@ bool Texto::cargar_texto(std::string inputText)
 	static std::mutex mi_mutex;
     std::lock_guard<std::mutex> mi_guard(mi_mutex);
 
-    static std::unique_ptr<TTF_Font, std::function<void(TTF_Font*)>> Fuente_TTF(TTF_OpenFont("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", 18), [](TTF_Font* puntero)
+    //static std::unique_ptr<TTF_Font, std::function<void(TTF_Font*)>> Fuente_TTF(TTF_OpenFont("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", 18), [](TTF_Font* puntero)
+	static std::unique_ptr<TTF_Font, std::function<void(TTF_Font*)>> Fuente_TTF(TTF_OpenFont("../FreeSansBold.ttf", 18), [](TTF_Font* puntero)
 	{
 		std::cout << "No need to call deleter in a static uniquer pointer (avoid semgentation fault).\n";
 	});
